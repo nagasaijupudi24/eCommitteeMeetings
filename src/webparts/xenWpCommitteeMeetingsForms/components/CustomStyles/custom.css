@@ -1,0 +1,48 @@
+.dialogcontent_{
+  width: 500px;
+  /* min-width: 200px; */
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #00000030 ;
+  border-bottom: 1px solid #00000030 ;
+
+}
+
+@media screen and (max-width: 767px) {
+
+    .dialogcontent_{
+      width:275px !important;
+    }
+   
+}
+
+div > .ql-container {
+  position: absolute !important;
+
+  /* border: 1px solid red !important; */
+  top:0px !important;
+  width: 90%;
+  left: 25px;
+}
+
+div > .ql-toolbar {
+ 
+  /* border: 1px solid red !important; */
+    left: 55px;
+    position: absolute !important;
+    top: -36px !important;
+     /* left: 200px; */
+}
+
+/* Responsive styles for width less than 768px */
+@media (max-width: 768px) {
+  div > .ql-container
+  {
+    left: 15px !important; 
+  }
+
+  
+  div > .ql-toolbar {
+    left: 50px !important; 
+  }
+}

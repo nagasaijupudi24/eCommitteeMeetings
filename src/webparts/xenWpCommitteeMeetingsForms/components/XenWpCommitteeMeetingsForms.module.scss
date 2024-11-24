@@ -1,0 +1,581 @@
+@import '~@fluentui/react/dist/sass/References.scss';
+ 
+.xenWpCommitteeMeetingsForms {
+  overflow: hidden;
+  padding: 1em;
+  color: "[theme:bodyText, default: #323130]";
+  color: var(--bodyText);
+  &.teams {
+    font-family: $ms-font-family-fallbacks;
+  }
+}
+ 
+.welcome {
+  text-align: center;
+}
+ 
+.welcomeImage {
+  width: 100%;
+  max-width: 420px;
+}
+ 
+.links {
+  a {
+    text-decoration: none;
+    color: "[theme:link, default:#03787c]";
+    color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
+ 
+    &:hover {
+      text-decoration: underline;
+      color: "[theme:linkHovered, default: #014446]";
+      color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
+    }
+  }
+}
+ 
+.commonProperties {
+  padding: 5px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row; /* Default to row layout */
+  justify-content: space-between; /* Spread items evenly */
+  align-items: center;
+  box-sizing: border-box;
+}
+ 
+.titleContainer {
+  flex-grow: 1;
+  margin: 10px;
+}
+ 
+.noteTitle {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+}
+
+.noteTitleView {
+  display: flex; /* Use flex instead of grid for consistent behavior */
+  flex-wrap: wrap; /* Allow items to wrap when needed */
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+ 
+.title {
+  font-size: 14px;
+  color: "[theme: themePrimary, default: #0078d7]";
+  order: 2; /* Default order for the title */
+}
+ 
+.titleDate {
+  text-align: right;
+  font-size: 14px;
+  // color: "[theme: themePrimary, default: #0078d7]";
+  order: 2; /* Default order for the title */
+}
+ 
+/* Mobile phones (less than 600px) */
+@media (max-width: 600px) {
+  .commonProperties {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center;
+    justify-content: flex-start; /* Stack from the top */
+    padding: 10px; /* Increased padding for mobile */
+  }
+ 
+  .title {
+    order: 1; /* Make title the first item when in column layout */
+  }
+}
+ 
+/* Tablets (600px - 768px) */
+@media (min-width: 600px) and (max-width: 768px) {
+  .commonProperties {
+    flex-direction: column; /* Still vertical but adjusted for tablet size */
+    padding: 8px; /* Slightly reduce padding */
+    justify-content: flex-start; /* Center vertically for tablets */
+  }
+ 
+  .title {
+    order: 1; /* Make title the first item when in column layout */
+  }
+}
+ 
+/* Small laptops (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .commonProperties {
+    flex-direction: row; /* Row layout on larger screens */
+    justify-content: space-around; /* Spread elements evenly across the container */
+    padding: 6px;
+  }
+ 
+  .title {
+    order: 1; /* Default order for the title */
+  }
+}
+ 
+/* Desktops (above 1024px) */
+@media (min-width: 1024px) {
+  .commonProperties {
+    flex-direction: row; /* Maintain row layout */
+    justify-content: space-between; /* Standard spacing on large screens */
+    padding: 5px;
+  }
+ 
+  .title {
+    order: 2; /* Default order for the title */
+  }
+}
+ 
+ 
+ 
+.status {
+  font-size: 14px;
+}
+ 
+.field {
+  color: #f31700;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.spanForPeoplePicker{
+  color:"[theme: themePrimary]"
+}
+ 
+ 
+ 
+.generalSectionMainContainer {
+  margin-top: 10px;
+  // text-align: center;
+  font-size: 16px;
+  border-radius: 8px;
+  color: white;
+  background-color: "[theme: themePrimary]" ;
+  font-weight: 300;
+  display: flex;
+  align-items: center; // Remove quotes for valid CSS
+  justify-content: center; // Remove quotes for valid CSS
+   // Remove quotes for valid CSS
+ 
+  // Flex direction
+  flex-direction: row; // Default to row for desktop and tablet
+ 
+  @media (max-width: 768px) { // Mobile and smaller
+    flex-direction: column; // Stack items vertically on small screens
+  }
+}
+ 
+ 
+.viewFormHeaderSectionContainer {
+  // border: 1px solid rgb(211, 211, 211);
+  // text-align: center;
+  font-size: 14px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-weight: 400;
+  padding: 5px;
+  justify-content: space-between;
+}
+ 
+ 
+.generalSection {
+  border: 1px solid rgb(211, 211, 211);
+  // border:1px solid red;
+  flex-wrap: wrap;
+ 
+ 
+  display: "flex";
+  justify-content: flex-start;
+  align-items: 'center';
+  // justify-content: space-around;
+  margin-top: 5px;
+  border-radius: 9px;
+  padding: 10px;
+  padding-right: 0px;
+  // min-height: 100px;
+ 
+ 
+ 
+ 
+}
+ 
+/* Tablet version */
+@media (max-width: 1024px) {
+  .generalSection {
+    /* Adjust padding for tablet */
+    padding: 8px;
+    padding-top: 4px;
+    /* Reduce border radius for a more compact look */
+    border-radius: 7px;
+    /* Optional: Adjust flex direction for tablet */
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+ 
+/* Mobile version */
+@media (max-width: 768px) {
+  .generalSection {
+    /* Adjust padding for mobile */
+    padding: 6px;
+    padding-top: 3px;
+    /* Further reduce border radius for mobile */
+    border-radius: 5px;
+    /* Flex direction for mobile */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Optional: Adjust minimum height for mobile */
+    min-height: 80px;
+  }
+}
+ 
+ 
+.halfWidth {
+  width: 48%;
+  gap:10px;
+  margin: 4px;
+ 
+  // border: 1px solid violet;
+}
+ 
+/* Tablet view */
+@media (max-width: 1024px) {
+  .halfWidth {
+    width: 90%;
+  }
+}
+ 
+/* Mobile view */
+@media (max-width: 768px) {
+  .halfWidth {
+    width: 90%;
+  }
+}
+ 
+/* Extra small devices (like smaller mobile screens) */
+@media (max-width: 480px) {
+  .halfWidth {
+    width: 90%;
+   
+  }
+}
+ 
+.warning {
+  color: red;
+  margin-left: 3px;
+}
+ 
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+ 
+.textField .fieldGroup {
+  display: block;
+  padding-top: 5px;
+  height: 32px;
+  box-sizing: border-box;
+  width: 100%;
+}
+ 
+.dropdown {
+  border-radius: 2px;
+  font-size: 16px;
+}
+ 
+ 
+.responsiveButton {
+  /* Default styles for desktop */
+  // width: 100px;
+  height: 32px;
+  font-size: 12px;
+  margin-top: 6px;  
+  padding-left: 10px;
+  padding-right: 10px;
+  // display: flex; /* Enable flexbox for alignment */
+  // align-items: center; /* Center content vertically */
+  // justify-content: center; /* Center content horizontally */
+ 
+  /* Icon padding */
+  svg {
+    margin-right: 4px; /* Space between icon and text */
+  }
+ 
+  @media (max-width: 1024px) { /* Tablet */
+    font-size: 12px;
+    // width: 80px;
+   
+  }
+ 
+  @media (max-width: 768px) { /* Smaller tablets / larger phones */
+    font-size: 12px;
+    // width: 80px;
+    // padding-left: 6px;
+    // padding-right: 6px;
+    display: flex; /* Enable flexbox for alignment */
+    align-items: center; /* Center content vertically */
+    justify-content: center;
+   
+  }
+ 
+  @media (max-width: 480px) { /* Mobile devices */
+    font-size: 12px;
+    // width: 70px;
+    padding-left: 6px;
+    padding-right: 6px;
+    display: flex; /* Enable flexbox for alignment */
+  align-items: center; /* Center content vertically */
+  justify-content: center;
+  }
+}
+ 
+ 
+.buttonSectionContainer {
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+ 
+.textarea {
+  display: block;
+  padding-left: 12px;
+  padding-top: 5px;
+  border-radius: 2px;
+  height: 31px;
+  box-sizing: border-box;
+  width: 100%;
+  // border: 1px solid rgb(86, 118, 152);
+}
+
+.textareaForMeetingLink {
+  display: block;
+  padding-left: 12px;
+  padding-top: 5px;
+  border-radius: 2px;
+
+  box-sizing: border-box;
+  width: 100%;
+  // border: 1px solid rgb(86, 118, 152);
+}
+
+
+// .wrappedLink {
+//   display: 'flex';
+//   // word-wrap: break-word; /* Ensures words are wrapped */
+//   // overflow-wrap: break-word; /* Alternative for better browser support */
+//   // white-space: normal; /* Allows the text to wrap to the next line */
+// }
+
+
+.parentContainer {
+  display: flex;
+  flex-direction: column; /* Aligns child elements properly */
+  overflow: hidden; /* Prevents overflow if necessary */
+}
+
+.meetingLink{
+   color:"[theme: themePrimary]";
+   display: inline-block; /* Ensures the element respects parent boundaries */
+  word-wrap: break-word; /* Allows breaking words that exceed the container's width */
+  white-space: normal; /* Ensures the text wraps */
+  overflow-wrap: break-word; /* Handles long words to prevent overflow */
+  max-width: 100%; 
+}
+ 
+ 
+.generalSectionApproverDetails {
+  border: 1px solid rgb(211, 211, 211);
+  // display: "flex";
+ 
+  // justify-content: space-between;
+  margin-top: 5px;
+  border-radius: 9px;
+  padding: 10px;
+  min-height: 100px;
+ 
+ 
+ 
+}
+
+
+.dialogHeaderIcon{
+   color: "[theme: themePrimary]"
+
+}
+ 
+ 
+.peoplePickerAndSpanContainer{
+  display: flex;
+                flex-direction: column;
+                margin-top: 8px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+                // overflow-x: auto;
+ 
+}
+ 
+.columnHalf {
+  flex: 1 1 50%;
+  max-width: 50%;
+}
+ 
+ 
+/* Base styles */
+.tableContainer {
+  border: 1px solid rgb(211, 211, 211);
+  padding: 4px;
+  border-radius: 8px;
+  margin-top: 6px;
+  overflow-x: auto;
+  /* Enables horizontal scrolling */
+}
+ 
+/* Tablet view */
+@media (max-width: 1024px) {
+  .tableContainer {
+    padding: 3px;
+    margin-top: 5px;
+  }
+}
+ 
+/* Mobile view */
+@media (max-width: 768px) {
+  .tableContainer {
+    padding: 2px;
+    margin-top: 4px;
+  }
+}
+ 
+/* Extra small devices (like smaller mobile screens) */
+@media (max-width: 480px) {
+  .tableContainer {
+    padding: 1px;
+    margin-top: 3px;
+  }
+}
+
+
+.dropdownFullWidth{
+  width: 180px !important;
+  display: block;
+}
+
+
+
+// .richTextContainer {
+//   position: relative;
+//   // max-width: 600px; /* Optional: Limit the width of the RichText field */
+//   // margin: 0 auto;
+//   width: 90%;
+
+//   .ql-toolbar.ql-snow {
+//     top: 0 !important;
+//   }
+//   .ql-active .ql-toolbar{
+//     position: relative !important;
+//     top: 0 !important;
+//   }
+//   .msRichTextToolbar {
+    
+   
+//     z-index: 1000; /* Ensure the toolbar stays above the content */
+//     background-color: white; /* Set a background color so it's visible */
+//     padding: 5px;
+//     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
+//   }
+
+ 
+
+//   .msRichTextField {
+//     margin-top: 40px; /* Add margin to ensure space for the sticky toolbar */
+//     height: 300px; /* Set a height for scrolling purposes */
+//     // overflow-y: auto; /* Allow vertical scrolling */
+//   }
+// }
+
+
+.modal {
+  padding: 10px;
+  min-width: 300px;
+  max-width: 80vw;
+  width: 100%;
+  margin: auto;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+@media (min-width: 768px) {
+  .modal {
+    max-width: 580px; /* Adjust width for medium screens */
+  }
+}
+
+@media (max-width: 767px) {
+  .modal {
+    max-width: 290px; /* Adjust width for smaller screens */
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  height: 50px;
+}
+
+.headerTitle {
+  margin: 5px 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 0;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .body {
+    margin-left: 20px;
+    margin-right: 20px; /* Adjust width for medium screens */
+  }
+}
+
+@media (max-width: 767px) {
+  .body {
+    margin-left: 20px;
+    margin-right: 20px; /* Adjust width for smaller screens */
+  }
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  border-top: 1px solid #ddd; /* Added border to the top of the footer */
+  padding-top: 12px;
+  height: 50px;
+}
+
+.button {
+  max-height: 32px;
+}
+
+
+
+
+
+ 

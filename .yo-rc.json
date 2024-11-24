@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.20.4",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.12.0"
+    },
+    "version": "1.19.0",
+    "libraryName": "xen-wp-committee-meetings-forms",
+    "libraryId": "e381c7eb-5f99-4aa6-bf6e-df484a53e117",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "XenWpCommitteeMeetingsForms",
+    "solutionShortDescription": "XenWpCommitteeMeetingsForms description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

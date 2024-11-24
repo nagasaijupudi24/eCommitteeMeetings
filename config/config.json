@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "xen-wp-committee-meetings-forms-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/xenWpCommitteeMeetingsForms/XenWpCommitteeMeetingsFormsWebPart.js",
+          "manifest": "./src/webparts/xenWpCommitteeMeetingsForms/XenWpCommitteeMeetingsFormsWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "XenWpCommitteeMeetingsFormsWebPartStrings": "lib/webparts/xenWpCommitteeMeetingsForms/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
+  }
+}
