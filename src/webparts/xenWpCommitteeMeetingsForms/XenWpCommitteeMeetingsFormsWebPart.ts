@@ -25,6 +25,7 @@ export interface IXenWpCommitteeMeetingsFormsWebPartProps {
   formType:string;
   libraryId:any;
   homePageUrl:string;
+  passCodeUrl:any;
 }
 
 export default class XenWpCommitteeMeetingsFormsWebPart extends BaseClientSideWebPart<IXenWpCommitteeMeetingsFormsWebPartProps> {
@@ -68,7 +69,8 @@ export default class XenWpCommitteeMeetingsFormsWebPart extends BaseClientSideWe
           committeeMeetingNameList:this.properties.committeeMeetingNameList,//formType
           formType:this.properties.formType,//formType
           libraryId:this.properties.libraryId,
-          homePageUrl:this.properties.homePageUrl
+          homePageUrl:this.properties.homePageUrl,
+          passCodeUrl:this.properties.passCodeUrl
         })
 
     }
@@ -217,6 +219,14 @@ export default class XenWpCommitteeMeetingsFormsWebPart extends BaseClientSideWe
                 PropertyPaneTextField('homePageUrl', {
                   label:"ReDirect Url",
                   value: this.properties.homePageUrl
+                }),
+
+                PropertyPaneTextField('passCodeCreateUrl', {
+                  label: "Create Passcode URL",
+                  // Use a default value for the home URL if the description is not provided.
+                  value: this.properties.passCodeUrl,
+                  resizable: true,
+                  // placeholder: "Enter home URL or description here"
                 }),
               ]
             }

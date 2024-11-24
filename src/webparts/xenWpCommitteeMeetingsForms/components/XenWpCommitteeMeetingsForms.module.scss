@@ -33,15 +33,15 @@
   }
 }
  
-.commonProperties {
-  padding: 5px;
-  margin-top: 5px;
-  display: flex;
-  flex-direction: row; /* Default to row layout */
-  justify-content: space-between; /* Spread items evenly */
-  align-items: center;
-  box-sizing: border-box;
-}
+// .commonProperties {
+//   padding: 5px;
+//   margin-top: 5px;
+//   display: flex;
+//   flex-direction: row; /* Default to row layout */
+//   justify-content: space-between; /* Spread items evenly */
+//   align-items: center;
+//   box-sizing: border-box;
+// }
  
 .titleContainer {
   flex-grow: 1;
@@ -55,12 +55,26 @@
   width: 100%;
 }
 
+
+@media (max-width: 768px) {
+  .noteTitle {
+    grid-template-columns: 1fr; /* Change to a single column */
+    grid-auto-rows: auto; /* Allow rows to grow automatically */
+    grid-template-rows: auto auto auto; /* Three rows for each item */
+    text-align: center; /* Center content for better presentation */
+  }
+}
+
 .noteTitleView {
   display: flex; /* Use flex instead of grid for consistent behavior */
   flex-wrap: wrap; /* Allow items to wrap when needed */
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+}
+
+.statusContainer{
+  order:1
 }
  
 .title {
@@ -75,6 +89,13 @@
   // color: "[theme: themePrimary, default: #0078d7]";
   order: 2; /* Default order for the title */
 }
+
+
+@media (max-width: 768px) {
+  .titleDate {
+    text-align: center;
+  }
+}
  
 /* Mobile phones (less than 600px) */
 @media (max-width: 600px) {
@@ -83,6 +104,10 @@
     align-items: center;
     justify-content: flex-start; /* Stack from the top */
     padding: 10px; /* Increased padding for mobile */
+  }
+
+  .statusContainer{
+    order:2
   }
  
   .title {
@@ -97,6 +122,10 @@
     padding: 8px; /* Slightly reduce padding */
     justify-content: flex-start; /* Center vertically for tablets */
   }
+
+  .statusContainer{
+    order:2
+  }
  
   .title {
     order: 1; /* Make title the first item when in column layout */
@@ -110,10 +139,8 @@
     justify-content: space-around; /* Spread elements evenly across the container */
     padding: 6px;
   }
+
  
-  .title {
-    order: 1; /* Default order for the title */
-  }
 }
  
 /* Desktops (above 1024px) */
@@ -339,6 +366,7 @@
   margin: 10px 0;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 5px;
 }
  
@@ -347,7 +375,7 @@
   padding-left: 12px;
   padding-top: 5px;
   border-radius: 2px;
-  height: 31px;
+  height: 32px;
   box-sizing: border-box;
   width: 100%;
   // border: 1px solid rgb(86, 118, 152);
@@ -415,7 +443,7 @@
                 flex-direction: column;
                 margin-top: 8px;
                 margin-bottom: 8px;
-                flex-wrap: wrap;
+                
                 // overflow-x: auto;
  
 }

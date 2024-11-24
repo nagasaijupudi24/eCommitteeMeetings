@@ -14,4 +14,5 @@ export interface IXenWpCommitteeMeetingsFormsProps {
   formType:string;
   libraryId:any;
   homePageUrl:any;
+  passCodeUrl:any
 }

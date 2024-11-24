@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 /* eslint-disable react/self-closing-comp */
@@ -14,20 +15,23 @@ import {
   // defaultDatePickerStrings,
   DetailsList,
   DetailsListLayoutMode,
-  Dialog,
-  DialogFooter,
-  DialogType,
+  // Dialog,
+  // DialogFooter,
+  // DialogType,
   // Dropdown,
   IColumn,
-  Icon,
+  // Icon,
+  IconButton,
   Link,
+  mergeStyleSets,
+  Modal,
   PrimaryButton,
   SelectionMode,
-  Stack,
   TextField,
   Toggle,
 } from "@fluentui/react";
 import { RichText } from "@pnp/spfx-controls-react/lib/controls/richText";
+import PasscodeModal from "./passCode/passCode";
 // import {
 //   IPeoplePickerContext,
 //   PeoplePicker,
@@ -68,27 +72,33 @@ interface CommtteeMeetingsState {
   Created: any;
   departmentAlias: any;
   meetingId: any;
+
+   // pass code
+   isPasscodeModalOpen: boolean;
+   isPasscodeValidated: boolean;
+ 
+   passCodeValidationFrom: any;
 }
 const getIdFromUrl = (): any => {
   const params = new URLSearchParams(window.location.search);
   const Id = params.get("itemId");
   return Number(Id);
 };
-const dragOptions = {
-  moveMenuItemText: "Move",
-  closeMenuItemText: "Close",
-  // menu: ContextualMenu,
-};
-const modalPropsStyles = {
-  main: {
-    maxWidth: 600,
-  },
-};
-const dialogContentProps = {
-  type: DialogType.normal,
-  title: "Alert",
-  // subText: "Do you want to send this message without a subject?",
-};
+// const dragOptions = {
+//   moveMenuItemText: "Move",
+//   closeMenuItemText: "Close",
+//   // menu: ContextualMenu,
+// };
+// const modalPropsStyles = {
+//   main: {
+//     maxWidth: 600,
+//   },
+// };
+// const dialogContentProps = {
+//   type: DialogType.normal,
+//   title: "Alert",
+//   // subText: "Do you want to send this message without a subject?",
+// };
 export default class XenWpCommitteeMeetingsViewForm extends React.Component<
   IXenWpCommitteeMeetingsFormsProps,
   CommtteeMeetingsState
@@ -134,6 +144,11 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       comments: "",
       isRturn: false,
       Created: null,
+
+        // pass code
+        isPasscodeModalOpen: false,
+        isPasscodeValidated: false, // New state to check if passcode is validated
+        passCodeValidationFrom: "",
     };
     const listName = this.props.listName;
     this._listName = listName?.title;
@@ -193,10 +208,97 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     }
   };
 
+  private stylesModal = mergeStyleSets({
+    modal: {
+      minWidth: "300px",
+      maxWidth: "80vw",
+      width: "100%",
+      "@media (min-width: 768px)": {
+        maxWidth: "580px", // Adjust width for medium screens
+      },
+      "@media (max-width: 767px)": {
+        maxWidth: "290px", // Adjust width for smaller screens
+      },
+      margin: "auto",
+      padding: "10px",
+      backgroundColor: "white",
+      borderRadius: "4px",
+      // height:'260px',
+      // display:'flex',
+      // flexDirection:'column',
+      // alignItem:'center',
+      // justifyContent:'center',
+
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.26)",
+    },
+    header: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      borderBottom: "1px solid #ddd",
+      minHeight: "50px",
+      padding: "5px",
+    },
+    headerTitle: {
+      margin: "5px",
+      marginLeft: "5px",
+      fontSize: "16px",
+      fontWeight: "400",
+    },
+    headerIcon: {
+      paddingRight: "0px", // Reduced space between the icon and the title
+    },
+    body: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      padding: "20px 0",
+      height: "100%",
+      "@media (min-width: 768px)": {
+        marginLeft: "20px", // Adjust width for smaller screens
+        marginRight: "20px", // Adjust width for medium screens
+      },
+      "@media (max-width: 767px)": {
+        marginLeft: "20px", // Adjust width for smaller screens
+        marginRight: "20px",
+      },
+    },
+    footer: {
+      display: "flex",
+      justifyContent: "space-between", // Adjusted to space between
+
+      borderTop: "1px solid #ddd",
+      paddingTop: "10px",
+      minHeight: "50px",
+    },
+    button: {
+      maxHeight: "32px",
+      flex: "1 1 50%", // Ensures each button takes up 50% of the footer width
+      margin: "0 5px", // Adds some space between the buttons
+    },
+    buttonContent: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    buttonIcon: {
+      marginRight: "4px", // Adjust the space between the icon and text
+    },
+
+    removeTopMargin: {
+      marginTop: "4px",
+      marginBottom: "14px",
+      fontWeight: "400",
+    },
+  });
+
   private _getItemBy = async () => {
-    let user = await this.props.sp?.web.currentUser();
+    // let user =
+     await this.props.sp?.web.currentUser();
     // this._currentUser =user.id
-    console.log(user, "user");
+    // console.log(user, "user");
     const itemId = getIdFromUrl();
     const item = await this.props.sp.web.lists
       .getByTitle(this._listName)
@@ -214,7 +316,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
         Chairman/EMail,
         PreviousApprover/EMail`).expand(`Author,Editor,
      CurrentApprover,PreviousApprover,FinalApprover,Chairman`)();
-    console.log(item, "item");
+    // console.log(item, "item");
 
     const currentyear = new Date().getFullYear();
     const nextYear = (currentyear + 1).toString().slice(-2);
@@ -601,20 +703,26 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     });
   };
   private onClickMemberReturn = () => {
-    if (this.state.comments) {
-      this.setState({
-        Confirmation: {
-          Confirmtext: "Are you sure you want to retrun this meeting?",
-          Description: "Please click on Confirm button to return meeting.",
-        },
-        hideCnfirmationDialog: false,
-        actionBtn: "mbrReturn",
-      });
-    } else {
+    if (this.state.comments===''){
       this.setState({
         hideWarningDialog: false,
       });
+
+    }else{
+       
+     if (!this.state.isPasscodeValidated) {
+      this.setState({
+        isPasscodeModalOpen: true,
+        passCodeValidationFrom: "7000",
+      }); // Open the modal
+      return; // Prevent the method from proceeding until passcode is validated
     }
+
+    }
+
+   
+   
+   
   };
   private onClickChairman = () => {
     this.setState({
@@ -628,13 +736,31 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
   };
 
   private handleApproveByMembers = async () => {
+
+    let PreviousApprover = null ;
+    let currentApproverIndex: any = null;
+    let currentApprover = null;
     const updatedCurrentApprover = this.state.CommitteeMeetingMembersDTO?.map(
-      (obj: { memberEmail: any }) => {
+      (obj: { memberEmail: any,userId:any },index:any) => {
+
+
+        if (index === currentApproverIndex +1){
+          currentApprover = obj.userId
+          
+        }
+
+        if (index ===  this.state.CommitteeMeetingMembersDTO.length){
+          currentApprover = this.state.CurrentApprover.id
+        }
+        
         if (
           obj.memberEmail.toLowerCase() ===
           this.props.context.pageContext.user.email.toLowerCase()
         ) {
+          PreviousApprover = obj.userId
+          currentApproverIndex = index
           return {
+            
             ...obj,
             status: "Approved",
             statusNumber: "9000",
@@ -659,9 +785,9 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     comments.push({
       comments: this.state.comments,
       commentedBy: this.props.userDisplayName,
-      createdDate:new Date().toLocaleDateString(),
+      createdDate: new Date().toLocaleDateString(),
     });
-    console.log(comments)
+    // console.log(comments);
     const item = await this.props.sp.web.lists
       .getByTitle(this._listName)
       .items.getById(getIdFromUrl())
@@ -671,6 +797,8 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
         // CommitteeMeetingMemberCommentsDT: this.state.comments
         //   ? JSON.stringify(comments)
         //   : null,
+        PreviousApproverId:PreviousApprover,
+        CurrentApproverId:currentApprover,
         MeetingStatus: isApprovedByAll
           ? "Pending Chairman Approval"
           : this.state.MeetingStatus,
@@ -714,9 +842,9 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     comments.push({
       comments: this.state.comments,
       commentedBy: this.props.userDisplayName,
-      createdDate:new Date().toLocaleDateString(),
+      createdDate: new Date().toLocaleDateString(),
     });
-    console.log(comments)
+    // console.log(comments);
     const item = await this.props.sp.web.lists
       .getByTitle(this._listName)
       .items.getById(getIdFromUrl())
@@ -752,9 +880,9 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     comments.push({
       comments: this.state.comments,
       commentedBy: this.props.userDisplayName,
-      createdDate:new Date().toLocaleDateString(),
+      createdDate: new Date().toLocaleDateString(),
     });
-    console.log(comments)
+    // console.log(comments);
     const item = await this.props.sp.web.lists
       .getByTitle(this._listName)
       .items.getById(getIdFromUrl())
@@ -827,22 +955,62 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     // console.log(currentApprover)
     return currentApprover[0]?.statusNumber !== "9000";
   };
-  public render(): React.ReactElement<IXenWpCommitteeMeetingsFormsProps> {
-    console.log(this.props,"prop ................")
-    console.log(this.state)
 
-    const modalProps: any = {
-      isBlocking: true,
-      styles: modalPropsStyles,
-      dragOptions: dragOptions,
-    };
+  private _makeIsPassCodeValidateFalse = (): void => {
+    this.setState({ isPasscodeValidated: false });
+  };
+
+
+
+  public handlePasscodeSuccess = () => {
+    this.setState(
+      { isPasscodeValidated: true, isPasscodeModalOpen: false },
+      () => {
+        // Re-run the _handleApproverButton function now that the passcode is validated
+
+        switch (this.state.passCodeValidationFrom) {
+        
+          case "7000": //call back
+          if (this.state.comments) {
+            this.setState({
+              Confirmation: {
+                Confirmtext: "Are you sure you want to return this meeting?",
+                Description: "Please click on Confirm button to return meeting.",
+              },
+              hideCnfirmationDialog: false,
+              actionBtn: "mbrReturn",
+            });
+          }
+         
+            break;
+          
+
+          default:
+            // console.log("default");
+            // result = false;
+            break;
+        }
+      }
+    );
+  };
+
+
+  public render(): React.ReactElement<IXenWpCommitteeMeetingsFormsProps> {
+    // console.log(this.props, "prop ................");
+    // console.log(this.state);
+
+    // const modalProps: any = {
+    //   isBlocking: true,
+    //   styles: modalPropsStyles,
+    //   dragOptions: dragOptions,
+    // };
 
     return (
       <div>
         {/* Title Seciton */}
         <div className={styles.titleContainer}>
-          <div className={`${styles.noteTitleView} ${styles.commonProperties}`}>
-            <div>
+          <div className={`${styles.noteTitle}`}>
+            <div className={styles.statusContainer}>
               {
                 <p className={styles.status}>
                   Status: {this.state.MeetingStatus}{" "}
@@ -1102,19 +1270,14 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
               <br />
               {this.state.isRturn && (
                 <div>
-                   <label className={styles.label}>
-                  Comments : 
-                  
-                 </label>
-                <TextField
-                  multiline
-                  value={this.state.comments}
-                  onChange={this.handleComments}
-                  placeholder="Add Comment"
-                ></TextField>
-
+                  <label className={styles.label}>Comments <span className={styles.warning}>*</span> :</label>
+                  <TextField
+                    multiline
+                    value={this.state.comments}
+                    onChange={this.handleComments}
+                    placeholder="Add Comment"
+                  ></TextField>
                 </div>
-                 
               )}
             </div>
           )}
@@ -1138,10 +1301,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
               className={`${styles.generalSectionApproverDetails}`}
               style={{ flexGrow: 1, margin: "10 10px" }}
             >
-               <label className={styles.label}>
-             Comments : 
-             
-            </label>
+              <label className={styles.label}>Comments :</label>
 
               <TextField
                 multiline
@@ -1279,118 +1439,172 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
             Exit
           </DefaultButton>
         </div>
-        <Dialog
-          hidden={this.state.hideCnfirmationDialog}
+        <Modal
+          isOpen={!this.state.hideCnfirmationDialog}
           onDismiss={() =>
             this.setState({
-              hideCnfirmationDialog: !this.state.hideCnfirmationDialog,
+              hideCnfirmationDialog: false,
             })
           }
-          dialogContentProps={{
-            ...dialogContentProps,
-            title: (
-              <Stack
-                horizontal
-                verticalAlign="center"
-                tokens={{ childrenGap: 8 }}
-                style={{ padding: "0 20px" }}
-              >
-                <Icon iconName="Info" className={styles.dialogHeaderIcon} />
-                <span style={{ fontSize: 18, fontWeight: "bold" }}>
-                  Confirmation
-                </span>
-              </Stack>
-            ),
-          }}
-          modalProps={modalProps}
-          maxWidth={600}
+          isBlocking={true}
+          containerClassName={this.stylesModal.modal}
         >
-          {this.state.Confirmation && (
-            <div className="dialogcontent_">
-              <p>{this.state.Confirmation.Confirmtext}</p>
-              <br />
-              <p>{this.state.Confirmation.Description}</p>
+          <>
+            <div className={this.stylesModal.header}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <IconButton iconProps={{ iconName: "WaitlistConfirm" }} />
+                <h4 className={this.stylesModal.headerTitle}>Confirmation</h4>
+              </div>
+              <IconButton
+                iconProps={{ iconName: "Cancel" }}
+                onClick={() =>
+                  this.setState({
+                    hideCnfirmationDialog: true,
+                  })
+                }
+              />
             </div>
-          )}
+            {this.state.Confirmation && (
+              <div className={this.stylesModal.body}>
+                <p className={`${this.stylesModal.removeTopMargin}`}>
+                  {this.state.Confirmation.Confirmtext}
+                </p>
+                <br />
+                <p className={`${this.stylesModal.removeTopMargin}`}>
+                  {this.state.Confirmation.Description}
+                </p>
+              </div>
+            )}
+            <div className={this.stylesModal.footer}>
+              <PrimaryButton
+                iconProps={{
+                  iconName: "SkypeCircleCheck",
+                  styles: { root: this.stylesModal.buttonIcon },
+                }}
+                onClick={this.onConfirmation}
+                text="Confirm"
+                className={this.stylesModal.button}
+                styles={{ root: this.stylesModal.buttonContent }}
+              />
+              <DefaultButton
+                iconProps={{
+                  iconName: "ErrorBadge",
+                  styles: { root: this.stylesModal.buttonIcon },
+                }}
+                onClick={() =>
+                  this.setState({
+                    hideCnfirmationDialog: true,
+                  })
+                }
+                text="Cancel"
+                className={this.stylesModal.button}
+                styles={{ root: this.stylesModal.buttonContent }}
+              />
+            </div>
+          </>
+        </Modal>
 
-          <DialogFooter>
-            <PrimaryButton
-              onClick={this.onConfirmation}
-              iconProps={{ iconName: "SkypeCircleCheck" }}
-            >
-              Confirm
-            </PrimaryButton>
-            <DefaultButton
-              iconProps={{ iconName: "ErrorBadge" }}
-              onClick={() =>
-                this.setState({
-                  hideCnfirmationDialog: !this.state.hideCnfirmationDialog,
-                })
-              }
-            >
-              Cancel
-            </DefaultButton>
-          </DialogFooter>
-        </Dialog>
-
-        <Dialog
-          hidden={this.state.hideSuccussDialog}
+        <Modal
+          isOpen={!this.state.hideSuccussDialog}
           onDismiss={() =>
             this.setState({
-              hideSuccussDialog: !this.state.hideSuccussDialog,
+              hideSuccussDialog: true,
             })
           }
-          dialogContentProps={dialogContentProps}
-          modalProps={modalProps}
-          maxWidth={600}
+          isBlocking={true}
+          containerClassName={this.stylesModal.modal}
         >
-          <div className="dialogcontent_">
-            <p>{this.state.SuccussMsg}</p>
-          </div>
+          <>
+            <div className={styles.header}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <IconButton iconProps={{ iconName: "Info" }} />
+                <h4 className={this.stylesModal.headerTitle}>Alert</h4>
+              </div>
+              <IconButton
+                iconProps={{ iconName: "Cancel" }}
+                onClick={() =>
+                  this.setState({
+                    hideSuccussDialog: true,
+                  })
+                }
+              />
+            </div>
+            <div className={styles.body}>
+              <p>{this.state.SuccussMsg}</p>
+            </div>
+            <div className={styles.footer}>
+              <PrimaryButton
+                className={styles.button}
+                iconProps={{ iconName: "ReplyMirrored" }}
+                onClick={() => {
+                  const pageURL: string = this.props.homePageUrl;
+                  window.location.href = `${pageURL}`;
+                  this.setState({
+                    hideSuccussDialog: true,
+                  });
+                }}
+                text="Ok"
+              />
+            </div>
+          </>
+        </Modal>
 
-          <DialogFooter>
-            <PrimaryButton
-              onClick={() => {
-                const pageURL: string = this.props.homePageUrl;
-                window.location.href = `${pageURL}`;
-                this.setState({
-                  hideSuccussDialog: !this.state.hideSuccussDialog,
-                });
-              }}
-              iconProps={{ iconName: "ReturnToSession" }}
-            >
-              Ok
-            </PrimaryButton>
-          </DialogFooter>
-        </Dialog>
-        <Dialog
-          hidden={this.state.hideWarningDialog}
+        <Modal
+          isOpen={!this.state.hideWarningDialog}
           onDismiss={() =>
             this.setState({
-              hideWarningDialog: !this.state.hideWarningDialog,
+              hideWarningDialog: true,
             })
           }
-          dialogContentProps={dialogContentProps}
-          modalProps={modalProps}
-          maxWidth={600}
+          isBlocking={true}
+          containerClassName={this.stylesModal.modal}
         >
-          <div className="dialogcontent_">
-            <p>Please fill in comments then click on return</p>
-          </div>
+          <>
+            <div className={styles.header}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <IconButton iconProps={{ iconName: "Info" }} />
+                <h4 className={this.stylesModal.headerTitle}>Alert</h4>
+              </div>
+              <IconButton
+                iconProps={{ iconName: "Cancel" }}
+                onClick={() =>
+                  this.setState({
+                    hideWarningDialog: true,
+                  })
+                }
+              />
+            </div>
+            <div className={styles.body}>
+              <p>Please fill in comments then click on return</p>
+            </div>
+            <div className={styles.footer}>
+              <PrimaryButton
+                className={styles.button}
+                iconProps={{ iconName: "ReplyMirrored" }}
+                onClick={() =>
+                  this.setState({
+                    hideWarningDialog: true,
+                  })
+                }
+                text="Ok"
+              />
+            </div>
+          </>
+        </Modal>
 
-          <DialogFooter>
-            <PrimaryButton
-              onClick={() =>
-                this.setState({
-                  hideWarningDialog: !this.state.hideWarningDialog,
-                })
-              }
-              iconProps={{ iconName: "ReturnToSession" }}
-            >
-              Ok
-            </PrimaryButton>
-          </DialogFooter>
-        </Dialog>
+        <form>
+              <PasscodeModal
+            createPasscodeUrl={this.props.passCodeUrl}
+            isOpen={this.state.isPasscodeModalOpen}
+            onClose={() => this.setState({
+              isPasscodeModalOpen: false,
+              isPasscodeValidated: false,
+            })}
+            // onSuccess={this.handlePasscodeSuccess} // Pass this function as the success handler
+            sp={this.props.sp}
+            user={this.props.context.pageContext.user}
+            _makeIsPassCodeValidateFalse={this._makeIsPassCodeValidateFalse} onSuccess={this.handlePasscodeSuccess}              />
+            </form>
       </div>
     );
   }

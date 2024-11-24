@@ -22,6 +22,7 @@
     "@pnp/sp": "^4.6.0",
     "@pnp/spfx-controls-react": "3.19.0",
     "@pnp/spfx-property-controls": "3.18.0",
+    "crypto-js": "^4.2.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "tslib": "2.3.1"
@@ -33,6 +34,7 @@
     "@microsoft/sp-build-web": "1.20.1",
     "@microsoft/sp-module-interfaces": "1.20.1",
     "@rushstack/eslint-config": "2.5.1",
+    "@types/crypto-js": "^4.2.2",
     "@types/react": "17.0.45",
     "@types/react-dom": "17.0.17",
     "@types/webpack-env": "~1.15.2",

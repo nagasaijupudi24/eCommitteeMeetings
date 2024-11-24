@@ -198,7 +198,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     };
     this.getfield();
     this._fetchDepartmentAlias();
-    console.log(this._homePageUrl)
+    // console.log(this._homePageUrl)
 
     const listName = this.props.listName;
     this._listName = listName?.title;
@@ -253,7 +253,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         .filter(
           `CommitteeType eq 'Committee' and CommitteeName eq '${committeeName}' and isMapped eq 'false'`
         )();
-      console.log(fieldDetails, "eCommittee Request ............");
+      // console.log(fieldDetails, "eCommittee Request ............");
 
       const dropDownDataListing = fieldDetails.map((each: any) => {
         return {
@@ -472,7 +472,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       )
       .expand("Chairman", "CurrentApprover")();
 
-    console.log(`${id} ------Details`, item);
+    // console.log(`${id} ------Details`, item);
 
    
 
@@ -820,7 +820,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             ariaLabel="Edit"
             onClick={() => {
               // console.log("Edit is Triggered");
-              console.log(item);
+              // console.log(item);
               this.setState({
                 dialogType: "mom",
                 isModalMOMOpen: true,
@@ -1358,7 +1358,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
   private _getCommitteeMeetingMembersDTO = (data: any): any => {
     const makeCommitteeMeetingMemberDTO = data.map((each: any, index: any) => {
-      console.log(each, "checking for srNo");
+      // console.log(each, "checking for srNo");
 
       return {
         createdDate: new Date(),
@@ -1372,7 +1372,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       };
     });
 
-    console.log(makeCommitteeMeetingMemberDTO);
+    // console.log(makeCommitteeMeetingMemberDTO);
     return JSON.stringify(makeCommitteeMeetingMemberDTO);
   };
 
@@ -1448,7 +1448,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       startProcessing: true,
       PreviousActionerId: (await this.props.sp?.web.currentUser())?.Id
     };
-    console.log(ecommitteObject);
+    // console.log(ecommitteObject);
     return ecommitteObject;
   };
 
@@ -1459,7 +1459,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       .items.add(await this.createEcommitteeMeetingObject("Created", "1000")).then(
         async (res:any)=>{
           const title = this._getTitle(res.Id)
-          console.log(title)
+          // console.log(title)
 
           await this.props.sp.web.lists
           .getByTitle(this._listName)
@@ -1512,7 +1512,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           ).then(
             async (res:any)=>{
               const title = this._getTitle(res.Id)
-              console.log(title)
+              // console.log(title)
     
               await this.props.sp.web.lists
               .getByTitle(this._listName)
@@ -1533,12 +1533,12 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
 
   private _handleReturnBack = async (): Promise<void> => {
-    console.log("Returned back triggered")
+    // console.log("Returned back triggered")
     const auditTrail = this.state.auditTrail || [];
-    const comments = this.state.CommitteeMeetingMemberCommentsDT;
+    // const comments = this.state.CommitteeMeetingMemberCommentsDT;
 
    
-    console.log(comments)
+    // console.log(comments)
 
 
     auditTrail.push({
@@ -1641,6 +1641,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       .items.getById(this._itemId)
       .update({
         StatusNumber: "5000",
+        MeetingStatus: "Pending with Committee Members",
 
         startProcessing: true,
       });
@@ -1869,7 +1870,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         </div>
         <div className={this.stylesModal.footer}>
           <PrimaryButton
-            iconProps={{ iconName: "ReturnToSession" }}
+            iconProps={{ iconName: "ReplyMirrored" }}
             // onClick={this._closeModal}
 
             onClick={() => {
@@ -2158,11 +2159,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         <div className={styles.footer}>
           <PrimaryButton
             className={styles.button}
-            iconProps={{ iconName: "ReturnToSession" }}
+            iconProps={{ iconName: "ReplyMirrored" }}
             onClick={() => {
               this._closeModal();
               const pageURL: string = this.props.homePageUrl;
-              console.log(pageURL)
+              // console.log(pageURL)
               window.location.href = `${pageURL}`;
             }}
             text="OK"
@@ -2199,7 +2200,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         <div className={styles.footer}>
           <PrimaryButton
             text="OK"
-            iconProps={{ iconName: "ReturnToSession" }}
+            iconProps={{ iconName: "ReplyMirrored" }}
             onClick={this._closeModal}
             // styles={buttonStyles}
           />
@@ -2315,8 +2316,8 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
   };
 
   public render(): React.ReactElement<IXenWpCommitteeMeetingsFormsProps> {
-    console.log(this.props, "Props of Edit and Create Form while fetching");
-    console.log(this.state);
+    // console.log(this.props, "Props of Edit and Create Form while fetching");
+    // console.log(this.state);
 
     // const {
     //   description,
@@ -2330,8 +2331,10 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       <div>
         {/* Title Seciton */}
         <div className={styles.titleContainer}>
-          <div className={`${styles.noteTitle} ${styles.commonProperties}`}>
-            <div>
+          <div className={`${styles.noteTitle}
+          
+          `}>
+            <div className={styles.statusContainer}>
               {this._itemId ? (
                 <p className={styles.status}>
                   Status:
@@ -2489,7 +2492,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
               strings={defaultDatePickerStrings}
               styles={{
                 root: {
-                  height: "36px",
+                  height: "32px",
                   border:
                     this.state.meetingSubject === "" &&
                     this.state.isWarningMeetingSubject
@@ -2516,7 +2519,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
                   this.state.meetingSubject === "" &&
                   this.state.isWarningMeetingSubject
                     ? "2px solid red"
-                    : "1px solid rgb(86, 118, 152)",
+                    : "",
               }}
             />
           </div>
@@ -2560,7 +2563,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
                   this.state.meetingLink === "" &&
                   this.state.isWarningMeetingLink
                     ? "2px solid red"
-                    : "1px solid rgb(86, 118, 152)",
+                    : "",
               }}
             />
           </div>
@@ -2583,7 +2586,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           <div>
             
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex",flexWrap:'wrap' }}>
                 <PeoplePicker
                   key={this.state.committeeMemberskey}
                   placeholder="Add Member..."
@@ -2651,7 +2654,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         >
           <div>
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex" ,flexWrap:'wrap'}}>
                 <PeoplePicker
                   key={this.state.committeeGuestMemberskey}
                   placeholder="Add Member..."
@@ -2721,7 +2724,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         >
           <div>
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex" ,flexWrap:'wrap'}}>
                 <Dropdown
                   selectedKey={this.state.committeeNoteRecordSelectedValue}
                   onChange={this.handleCommitteeNoteRecordsDropdownChange}
@@ -2809,7 +2812,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             this.state.statusNumber !== "2000" &&
             this.state.statusNumber !== "3000" &&
             this.state.statusNumber !== "4000" &&
-            this.state.statusNumber !== "5000" && this.state.statusNumber !== "7000" &&this.state.statusNumber !== "9000" && (
+            this.state.statusNumber !== "5000" &&this.state.statusNumber !== "6000" && this.state.statusNumber !== "7000" &&this.state.statusNumber !== "9000" && (
               <PrimaryButton
                 // type="button"
                 onClick={() => {
@@ -2838,7 +2841,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           {this.state.statusNumber !== "2000" &&
             this.state.statusNumber !== "3000" &&
             this.state.statusNumber !== "4000" &&
-            this.state.statusNumber !== "5000" && this.state.statusNumber !== "7000" && this.state.statusNumber !== "9000" && (
+            this.state.statusNumber !== "5000"  &&this.state.statusNumber !== "6000" && this.state.statusNumber !== "7000" && this.state.statusNumber !== "9000" && (
               <PrimaryButton
                 // type="button"
 
@@ -2955,7 +2958,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           <DefaultButton
             // type="button"
             onClick={() => {
-              const pageURL: string = this.props.homePageUrl;
+              const pageURL: string = this._homePageUrl;
               window.location.href = `${pageURL}`;
             }}
             className={`${styles.responsiveButton} `}

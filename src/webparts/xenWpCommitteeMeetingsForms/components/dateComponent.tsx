@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import styles from "./XenWpCommitteeMeetingsForms.module.scss";
 
 const DateTime: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -14,7 +15,7 @@ const DateTime: React.FC = () => {
   }-${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
 
   return (
-    <p style={{ textAlign: "right", fontSize: "1rem", margin: 0 }}>
+    <p style={{ fontSize: "1rem", margin: 0 }} className={styles.titleDate}>
       Date: {formattedDate}
     </p>
   );

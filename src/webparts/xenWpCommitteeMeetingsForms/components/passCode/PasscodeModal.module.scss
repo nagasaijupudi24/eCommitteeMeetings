@@ -1,0 +1,26 @@
+.passcodeModalContainer {
+    width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .closeButton {
+    color: #000;
+  }
+  
+  .body {
+    margin-top: 20px;
+  }
+  
+  .buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
