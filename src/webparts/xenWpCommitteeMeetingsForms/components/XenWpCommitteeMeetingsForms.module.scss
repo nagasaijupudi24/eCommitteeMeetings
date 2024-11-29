@@ -371,6 +371,7 @@
 }
  
 .textarea {
+  outline-color: "[theme: themePrimary]" ;
   display: block;
   padding-left: 12px;
   padding-top: 5px;
@@ -382,6 +383,7 @@
 }
 
 .textareaForMeetingLink {
+  outline-color: "[theme: themePrimary]" ;
   display: block;
   padding-left: 12px;
   padding-top: 5px;
@@ -557,6 +559,7 @@
   align-items: center;
   border-bottom: 1px solid #ddd;
   height: 50px;
+  padding-bottom: 12px;
 }
 
 .headerTitle {
@@ -601,6 +604,14 @@
 .button {
   max-height: 32px;
 }
+
+.spinnerModalTranparency{
+  background: 'transparent'; // Removes background color
+  box-shadow: 'none', 
+
+}
+
+
 
 
 

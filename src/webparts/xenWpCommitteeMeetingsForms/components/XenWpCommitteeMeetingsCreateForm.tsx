@@ -28,6 +28,8 @@ import {
   Modal,
   PrimaryButton,
   SelectionMode,
+  Spinner,
+  SpinnerSize,
   TextField,
 } from "@fluentui/react";
 import {
@@ -35,6 +37,7 @@ import {
   PeoplePicker,
   PrincipalType,
 } from "@pnp/spfx-controls-react/lib/PeoplePicker";
+
 import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/fields";
@@ -47,6 +50,7 @@ import "@pnp/sp/files";
 import "@pnp/sp/profiles";
 import "@pnp/sp/site-groups";
 import DateTime from "./dateComponent";
+
 // import { escape } from '@microsoft/sp-lodash-subset';
 
 interface CommtteeMeetingsStateProps {
@@ -99,6 +103,7 @@ interface CommtteeMeetingsStateProps {
   isWarningMeetingLink: boolean;
 
   isSmallScreen: boolean;
+  isLoading:any;
 }
 
 const getIdFromUrl = (): any => {
@@ -187,6 +192,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       isWarningMeetingSubject: false,
       isWarningMeetingMode: false,
       isWarningMeetingLink: false,
+      isLoading:true,
 
       isSmallScreen: window.innerWidth < 568,
     };
@@ -216,12 +222,17 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
     const libraryTilte = this.props.libraryId;
     this._libraryName = libraryTilte?.title;
+
   }
 
 
   public componentDidMount() {
     // Add resize listener
     window.addEventListener('resize', this.handleResize);
+    
+    setTimeout(() => {
+      this.setState({isLoading:false})
+    }, 3000);
   }
 
   public componentWillUnmount() {
@@ -255,7 +266,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         )();
       // console.log(fieldDetails, "eCommittee Request ............");
 
-      const dropDownDataListing = fieldDetails.map((each: any) => {
+      const dropDownDataListing = fieldDetails.filter(
+        (each:any)=>{
+          // console.log(each)
+          return each.isMapped === false}
+      ).map((each: any) => {
         return {
           key: each.Title,
           text: each.Title,
@@ -275,7 +290,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
               noteTitle: each.Title,
               committeeName: each.CommitteeName,
               department: each.Department,
-              noteLink: link[1],
+              noteLink: link[0],
               link: link[1],
               mom: "",
             };
@@ -377,6 +392,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       });
 
       // console.log(pdfLink);
+      // console.log(url)
       return [pdfLink, url];
     } catch {
       // console.log("failed to fetch");
@@ -400,39 +416,49 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
       // console.log("Fetched items from Departments:", items);
 
-      // Step 2: Find the department entry where the Title or Department contains "Development"
-      const specificDepartment = items.find(
-        (each: any) =>
-          each.Department.includes("Development") ||
-          each.Title?.includes("Development")
-      );
+      // let deparement = '';
 
-      if (specificDepartment) {
-        const departmentAlias = specificDepartment.DepartmentAlias;
-        // console.log(
-        //   "Department alias for department with 'Development' in title:",
-        //   departmentAlias
-        // );
+      const profile = await this.props.sp.profiles.myProperties();
 
-        // Step 3: Update state with the department alias
-        this.setState(
-          {
-            departmentAlias: departmentAlias, // Store the department alias
-          },
-          () => {
+      // this._userName = profile.DisplayName;
+      // this._role = profile.Title;
+
+      profile.UserProfileProperties.filter((element: any) => {
+        if (element.Key === "Department") {
+          // department: element.Value
+
+          const specificDepartment = items.find(
+            (each: any) =>
+              each.Department.includes(element.Value) ||
+              each.Title?.includes(element.Value)
+          );
+    
+          if (specificDepartment) {
+            const departmentAlias = specificDepartment.DepartmentAlias;
             // console.log(
-            //   "Updated state with department alias:",
-            //   this.state.departmentAlias
+            //   "Department alias for department with 'Development' in title:",
+            //   departmentAlias
             // );
+    
+            // Step 3: Update state with the department alias
+            this.setState(
+              {
+                departmentAlias: departmentAlias, // Store the department alias
+              },
+              
+            );
           }
-        );
-      } else {
-        // console.log("No department found with 'Development' in title.");
-      }
+        }
+      });
+
+
+      // Step 2: Find the department entry where the Title or Department contains "Development"
+      
     } catch (error) {
       // console.error("Error fetching department alias: ", error);
     }
   };
+
 
 
   private _getTitle = (id:any):any=>{
@@ -497,6 +523,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       convernorFeildValue: item.Department,
       charimanFeildValue: item.Chairman.Title,
       auditTrail: JSON.parse(item.AuditTrail),
+      isLoading:false
     });
 
     return item;
@@ -591,7 +618,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Members",
       fieldName: "memberEmailName",
       minWidth: 150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -599,7 +626,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth:150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -607,7 +634,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Designation",
       fieldName: "designation",
       minWidth: 150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -684,7 +711,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Guest Members",
       fieldName: "memberEmailName",
       minWidth: 150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -692,7 +719,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth: 150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -700,7 +727,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Designation",
       fieldName: "designation",
       minWidth: 150,
-      maxWidth: 290,
+      maxWidth: 230,
       isResizable: true,
     },
     {
@@ -813,7 +840,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       maxWidth: 200,
       isResizable: true,
       onRender: (item) =>
-        this._itemId ? (
+       ( this.state.statusNumber !== "1000" && this.state.statusNumber !== "2000" && this.state.statusNumber !== '') ? (
           <IconButton
             iconProps={{ iconName: "Edit" }}
             title="Edit"
@@ -837,6 +864,28 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             onClick={() => this._deleteRecord(item.id)}
           />
         ),
+    },
+  ];
+
+
+  private columnsCommitteeComments: IColumn[] = [
+    {
+      key: "comments",
+      name: "Comments",
+      fieldName: "comments",
+      minWidth: 200, // adjusted to match a percentage as close as possible
+      maxWidth: 550,
+      isResizable: true,
+      // className: styles.columnHalf, // Apply the 50% width class
+    },
+    {
+      key: "commentedBy",
+      name: "Commented by",
+      fieldName: "commentedBy",
+      minWidth: 200,
+      maxWidth: 550,
+      isResizable: true,
+      // className: styles.columnHalf, // Apply the 50% width class
     },
   ];
 
@@ -925,6 +974,10 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         selectedCommitteeMembersEmail === this.state.charimanData.EMail;
       // console.log(selectedMemberIsAChairman);
 
+      const selectedMemberIsACon =
+      selectedCommitteeMembersEmail === this.state.convernorData.EMail;
+    // console.log(selectedMemberIsACon);
+
       // Condition checks
       const iscommitteeMemberOrcommitteeGuestMembers =
         committeeGuestMembersEmail.includes(selectedCommitteeMembersEmail) ||
@@ -936,7 +989,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       return (
         iscommitteeMemberOrcommitteeGuestMembers ||
         isCurrentUserCommitteMember ||
-        selectedMemberIsAChairman
+        selectedMemberIsAChairman ||selectedMemberIsACon
       );
     };
 
@@ -1324,13 +1377,18 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           "Convener/EMail"
         )
         .expand("Convener", "Chairman")();
+
+       
       // console.log(fieldDetails);
-      fieldDetails.filter((each: any) => {
+      fieldDetails.filter(async (each: any) => {
         if (each.CommitteeNames === value) {
+          // console.log(each,"committe Name List")
+          const convenorDepartment = await this.getUserDepartmentByEmail(each.ConvenerId)
+          // console.log(convenorDepartment)
           this.setState({
             charimanFeildValue: each.Chairman.Title,
-            convernorFeildValue: each.Department,
-            convernorData: { ...each.Convener, convenerId: each.ConvenerId },
+            // convernorFeildValue: each.Department,
+            convernorData: { ...each.Convener, convenerId: each.ConvenerId,department:convenorDepartment },
             charimanData: { ...each.Chairman, chairmanId: each.ChairmanId },
           });
         }
@@ -1404,7 +1462,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     const auditLog = {
       actionBy: this.props.context.pageContext.user.displayName,
 
-      action: `Committee meeting has been ${status.toLowerCase()} successfully`,
+      action: `Committee Meeting ${status}`,
 
       
       actionDate: new Date().toLocaleDateString(),
@@ -1442,6 +1500,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         this.state.committeeGuestMembersData
       ),
       MeetingStatus: status,
+      ConvenerDTO:JSON.stringify(this.state.convernorData),
       Department: this.state.convernorFeildValue,
       StatusNumber: statusNumber,
       AuditTrail: JSON.stringify(auditTrail),
@@ -1453,6 +1512,9 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
   };
 
   private _handleCreateMeeting = async (): Promise<void> => {
+    this.setState({ isModalOpen: false,isLoading:true });
+
+
       
       await this.props.sp.web.lists
       .getByTitle(this._listName)
@@ -1479,14 +1541,15 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
 
 
-    this.setState({ isModalOpen: false });
-    this.setState({ isModalOpen: true, dialogType: "success" });
+   
+    this.setState({isLoading:false, isModalOpen: true, dialogType: "success" });
   };
 
   private _handlePulbicMeeting = async (): Promise<void> => {
+    this.setState({ isModalOpen: false,isLoading:true });
     
     const auditTrail = {
-      action: `Committee meeting has been published successfully`,
+      action: `Committee Meeting Published`,
       actionBy: this.props.userDisplayName,
       actionDate: new Date().toLocaleDateString(),
     }
@@ -1526,14 +1589,13 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           );
     // const id = response.Id;
     // console.log(id);
-    this.setState({ isModalOpen: false });
-
-    this.setState({ isModalOpen: true, dialogType: "success" });
+    this.setState({isLoading:false, isModalOpen: true, dialogType: "success" });
   };
 
 
   private _handleReturnBack = async (): Promise<void> => {
     // console.log("Returned back triggered")
+    this.setState({ isModalOpen: false,isLoading:true });
     const auditTrail = this.state.auditTrail || [];
     // const comments = this.state.CommitteeMeetingMemberCommentsDT;
 
@@ -1554,6 +1616,10 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           .update(
             {
               CommitteeMeetingMembersDTO: this._getCommitteeMeetingMembersDTO(
+                this.state.committeeMembersData
+              ),
+
+              CurrentApproverId: this._getCurrrentApproverId(
                 this.state.committeeMembersData
               ),
               
@@ -1581,12 +1647,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       
     // const id = response.Id;
     // console.log(id);
-    this.setState({ isModalOpen: false });
-
-    this.setState({ isModalOpen: true, dialogType: "success" });
+    this.setState({isLoading:false, isModalOpen: true, dialogType: "success" });
   };
 
   private _handleMeetingOver = async (): Promise<void> => {
+    this.setState({ isModalOpen: false,isLoading:true });
     const auditTrail = this.state.auditTrail || [];
 
     auditTrail.push({
@@ -1608,11 +1673,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     // const id = response.Id;
    
     // console.log(id);
-    this.setState({ isModalOpen: false });
-    this.setState({ isModalOpen: true, dialogType: "success" });
+    this.setState({isLoading:false, isModalOpen: true, dialogType: "success" });
   };
 
   private _handleMOMPublished = async (): Promise<void> => {
+    this.setState({ isModalOpen: false,isLoading:true });
     const auditTrail = this.state.auditTrail || [];
 
     auditTrail.push({
@@ -1641,7 +1706,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       .items.getById(this._itemId)
       .update({
         StatusNumber: "5000",
-        MeetingStatus: "Pending with Committee Members",
+        MeetingStatus: "Pending Approval",
 
         startProcessing: true,
       });
@@ -1656,8 +1721,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     });
     // const id = response.Id;
     // console.log(id);
-    this.setState({ isModalOpen: false });
-    this.setState({ isModalOpen: true, dialogType: "success" });
+    this.setState({isLoading:false, isModalOpen: true, dialogType: "success" });
   };
 
   private options: IDropdownOption[] = [
@@ -1738,15 +1802,19 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     });
   };
 
-  private _checkAllNoteRecord = (): any => {
-    const isMOMAvailableForAllNotes = this.state.committeeNoteRecordsData.every(
-      (each: any) => each.mom === ""
+  private _checkAllNoteRecord = (): boolean => {
+    const isAnyMOMEmpty = this.state.committeeNoteRecordsData.some(
+      (each: any) => {
+        // console.log(each, "Each Note Record");
+        // console.log(each.mom === "", "each MOM is empty...");
+        return each.mom === "";
+      }
     );
-    // console.log(isMOMAvailableForAllNotes);
-
-    return isMOMAvailableForAllNotes;
+  
+    // console.log(isAnyMOMEmpty, "Is any MOM empty?");
+    return isAnyMOMEmpty;
   };
-
+  
   private stylesModal = mergeStyleSets({
     modal: {
       padding: "10px",
@@ -2064,6 +2132,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
               }
             })()}
           </p>
+          <br/>
           <p className={`${styles.removeTopMargin}`}>
             {(() => {
               switch (this.state.btnType) {
@@ -2315,6 +2384,37 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     return isValid;
   };
 
+  // import { sp } from "@pnp/sp";
+
+  private getUserDepartmentByEmail = async (id: any): Promise<string | null> => {
+    try {
+      const userProfile = await this.props.sp.web.getUserById(id)();
+      // console.log(userProfile);
+  
+      const profile = await this.props.sp.profiles.getPropertiesFor(userProfile?.LoginName);
+      // console.log(profile.DisplayName);
+      // console.log(profile.Email);
+      // console.log(profile.Title);
+  
+      const departmentProperty = profile.UserProfileProperties.find(
+        (element: any) => element.Key === "Department"
+      );
+  
+      const department = departmentProperty?.Value || null;
+      // console.log(department, "Department");
+      this.setState({convernorFeildValue:department})
+  
+      return department;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  };
+  
+// Example usage:
+// getUserDepartmentByEmail("user@example.com");
+
+
   public render(): React.ReactElement<IXenWpCommitteeMeetingsFormsProps> {
     // console.log(this.props, "Props of Edit and Create Form while fetching");
     // console.log(this.state);
@@ -2492,7 +2592,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
               strings={defaultDatePickerStrings}
               styles={{
                 root: {
-                  height: "32px",
+                  height: "35px",
                   border:
                     this.state.meetingSubject === "" &&
                     this.state.isWarningMeetingSubject
@@ -2579,66 +2679,77 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             Committee Members
           </h1>
         </div>
-        <div
-          className={`${styles.generalSectionApproverDetails}`}
-          style={{ flexGrow: 1, margin: "10 10px" }}
-        >
-          <div>
+       
+            <div
+            className={`${styles.generalSectionApproverDetails}`}
+            style={{ flexGrow: 1, margin: "10 10px" }}
+          >
+            <div>
+              { (this.state.statusNumber=== '' || this.state.statusNumber=== '1000'|| this.state.statusNumber=== '2000')
             
+            && 
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex",flexWrap:'wrap' }}>
-                <PeoplePicker
-                  key={this.state.committeeMemberskey}
-                  placeholder="Add Member..."
-                  context={this._peopplePicker}
-                  // titleText="People Picker"
-                  personSelectionLimit={1}
-                  groupName={""} // Leave this blank in case you want to filter from all users
-                  showtooltip={true}
-                  defaultSelectedUsers={[""]}
-                  disabled={false}
-                  ensureUser={true}
-                  onChange={this._getPeoplePickerItemsCommitteeMembers}
-                  // showHiddenInUI={false}
-                  principalTypes={[PrincipalType.User]}
-                  resolveDelay={1000}
-                />
-                {/* <PeoplePicker /> */}
-                <DefaultButton
-                  style={{ marginTop: "0px", marginLeft: "6px" }}
-                  type="button"
-                  className={`${styles.responsiveButton}`}
-                  onClick={(e) => {
-                    if (this.state.selectedCommitteeMembers.length === 0) {
-                      this.setState({
-                        isModalOpen: true,
-                        modalMessage: "Please select Member then click on Add.",
-                      });
-                      this._clearCommitteeMembersPeoplePicker();
-                      return;
-                    }
-                    this.handleOnAdd(e, "committeeMembers");
-                  }}
-                  iconProps={{ iconName: "Add" }}
-                >
-                  Add
-                </DefaultButton>
-              </div>
-              <span className={`${styles.spanForPeoplePicker}`}>
-                    (Please enter minimum 3 character to search)
-                  </span>
+            <div style={{ display: "flex",flexWrap:'wrap' }}>
+              <PeoplePicker
+                key={this.state.committeeMemberskey}
+                placeholder="Add Member..."
+                context={this._peopplePicker}
+                // titleText="People Picker"
+                personSelectionLimit={1}
+                groupName={""} // Leave this blank in case you want to filter from all users
+                showtooltip={true}
+                defaultSelectedUsers={[""]}
+                disabled={false}
+                ensureUser={true}
+                onChange={this._getPeoplePickerItemsCommitteeMembers}
+                // showHiddenInUI={false}
+                principalTypes={[PrincipalType.User]}
+                resolveDelay={1000}
+              />
+              {/* <PeoplePicker /> */}
+              <DefaultButton
+                style={{ marginTop: "0px", marginLeft: "6px" }}
+                type="button"
+                className={`${styles.responsiveButton}`}
+                onClick={(e) => {
+                  if (this.state.selectedCommitteeMembers.length === 0) {
+                    this.setState({
+                      isModalOpen: true,
+                      modalMessage: "Please select Member then click on Add.",
+                    });
+                    this._clearCommitteeMembersPeoplePicker();
+                    return;
+                  }
+                  this.handleOnAdd(e, "committeeMembers");
+                }}
+                iconProps={{ iconName: "Add" }}
+              >
+                Add
+              </DefaultButton>
+            </div>
+            <span className={`${styles.spanForPeoplePicker}`}>
+                  (Please enter minimum 3 character to search)
+                </span>
+          </div>}
+              
+            
+              
             </div>
             <div style={{ overflowX: "auto" }}>
-              <DetailsList
-                items={this.state.committeeMembersData} // Data for the table
-                columns={this.columnsCommitteeMembers} // Columns for the table
-                layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
-                selectionMode={SelectionMode.none} // No selection column
-                isHeaderVisible={true} // Show column headers
-              />
-            </div>
+                <DetailsList
+                  items={this.state.committeeMembersData} // Data for the table
+                  columns={this.columnsCommitteeMembers} // Columns for the table
+                  layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
+                  selectionMode={SelectionMode.none} // No selection column
+                  isHeaderVisible={true} // Show column headers
+                />
+              </div>
+          
           </div>
-        </div>
+
+            
+
+      
         {/* Committee Guest  section */}
         <div
           className={`${styles.generalSectionMainContainer}`}
@@ -2653,51 +2764,55 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           style={{ flexGrow: 1, margin: "10 10px" }}
         >
           <div>
+            {(this.state.statusNumber=== '' || this.state.statusNumber=== '1000'|| this.state.statusNumber=== '2000')
+            
+            &&
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex" ,flexWrap:'wrap'}}>
-                <PeoplePicker
-                  key={this.state.committeeGuestMemberskey}
-                  placeholder="Add Member..."
-                  context={this._peopplePicker}
-                  // titleText="People Picker"
-                  personSelectionLimit={1}
-                  groupName={""} // Leave this blank in case you want to filter from all users
-                  showtooltip={true}
-                  defaultSelectedUsers={[""]}
-                  disabled={false}
-                  ensureUser={true}
-                  onChange={this._getPeoplePickerItemsCommitteeGuestMembers}
-                  // showHiddenInUI={false}
-                  principalTypes={[PrincipalType.User]}
-                  resolveDelay={1000}
-                />
-                {/* <PeoplePicker /> */}
-                <DefaultButton
-                  style={{ marginTop: "0px", marginLeft: "6px" }}
-                  type="button"
-                  className={`${styles.responsiveButton}`}
-                  onClick={(e) => {
-                    if (this.state.selectedCommitteeGuestMembers.length === 0) {
-                      this.setState({
-                        isModalOpen: true,
-                        modalMessage:
-                          "Please select Guest member then click on Add.",
-                      });
-                      this._clearCommitteeMembersPeoplePicker();
-                      return;
-                    }
+            <div style={{ display: "flex" ,flexWrap:'wrap'}}>
+              <PeoplePicker
+                key={this.state.committeeGuestMemberskey}
+                placeholder="Add Member..."
+                context={this._peopplePicker}
+                // titleText="People Picker"
+                personSelectionLimit={1}
+                groupName={""} // Leave this blank in case you want to filter from all users
+                showtooltip={true}
+                defaultSelectedUsers={[""]}
+                disabled={false}
+                ensureUser={true}
+                onChange={this._getPeoplePickerItemsCommitteeGuestMembers}
+                // showHiddenInUI={false}
+                principalTypes={[PrincipalType.User]}
+                resolveDelay={1000}
+              />
+              {/* <PeoplePicker /> */}
+              <DefaultButton
+                style={{ marginTop: "0px", marginLeft: "6px" }}
+                type="button"
+                className={`${styles.responsiveButton}`}
+                onClick={(e) => {
+                  if (this.state.selectedCommitteeGuestMembers.length === 0) {
+                    this.setState({
+                      isModalOpen: true,
+                      modalMessage:
+                        "Please select Guest member then click on Add.",
+                    });
+                    this._clearCommitteeMembersPeoplePicker();
+                    return;
+                  }
 
-                    this.handleOnAdd(e, "committeeGuestMembers");
-                  }}
-                  iconProps={{ iconName: "Add" }}
-                >
-                  Add
-                </DefaultButton>
-              </div>
-              <span className={`${styles.spanForPeoplePicker}`}>
-                    (Please enter minimum 3 character to search)
-                  </span>
+                  this.handleOnAdd(e, "committeeGuestMembers");
+                }}
+                iconProps={{ iconName: "Add" }}
+              >
+                Add
+              </DefaultButton>
             </div>
+            <span className={`${styles.spanForPeoplePicker}`}>
+                  (Please enter minimum 3 character to search)
+                </span>
+          </div>}
+           
             <div style={{ overflowX: "auto" }}>
               <DetailsList
                 items={this.state.committeeGuestMembersData} // Data for the table
@@ -2723,44 +2838,48 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           style={{ flexGrow: 1, margin: "10 10px" }}
         >
           <div>
+            {(this.state.statusNumber=== ''|| this.state.statusNumber=== '1000'|| this.state.statusNumber=== '2000')
+            
+            &&
             <div className={`${styles.peoplePickerAndSpanContainer}`}>
-              <div style={{ display: "flex" ,flexWrap:'wrap'}}>
-                <Dropdown
-                  selectedKey={this.state.committeeNoteRecordSelectedValue}
-                  onChange={this.handleCommitteeNoteRecordsDropdownChange}
-                  options={this.state.committeeNoteRecordDropDownData}
-                  placeholder="Add Note Record..."
-                  styles={{
-                    root: {
-                      minWidth: "180px",
-                    },
-                  }}
-                />
-                {/* <PeoplePicker /> */}
-                <DefaultButton
-                  style={{ marginTop: "0px", marginLeft: "6px" }}
-                  type="button"
-                  className={`${styles.responsiveButton}`}
-                  // onClick={(e) => this.handleOnAdd(e, "committeeNoteRecords")}
-                  iconProps={{ iconName: "Add" }}
-                  onClick={() => {
-                    if (this.state.committeeNoteRecordSelectedValue === "") {
-                      this.setState({
-                        isModalOpen: true,
-                        modalMessage: "Please select Note then click on Add.",
-                      });
-                      this._clearCommitteeMembersPeoplePicker();
-                      return;
-                    }
-                    this._handleOnAddCommitteeNoteRecords();
-                    this.setState({ committeeNoteRecordSelectedValue: "" });
-                  }}
-                >
-                  Add
-                </DefaultButton>
-              </div>
-             
+            <div style={{ display: "flex" ,flexWrap:'wrap'}}>
+              <Dropdown
+                selectedKey={this.state.committeeNoteRecordSelectedValue}
+                onChange={this.handleCommitteeNoteRecordsDropdownChange}
+                options={this.state.committeeNoteRecordDropDownData}
+                placeholder="Add Note Record..."
+                styles={{
+                  root: {
+                    minWidth: "180px",
+                  },
+                }}
+              />
+              {/* <PeoplePicker /> */}
+              <DefaultButton
+                style={{ marginTop: "0px", marginLeft: "6px" }}
+                type="button"
+                className={`${styles.responsiveButton}`}
+                // onClick={(e) => this.handleOnAdd(e, "committeeNoteRecords")}
+                iconProps={{ iconName: "Add" }}
+                onClick={() => {
+                  if (this.state.committeeNoteRecordSelectedValue === "") {
+                    this.setState({
+                      isModalOpen: true,
+                      modalMessage: "Please select Note then click on Add.",
+                    });
+                    this._clearCommitteeMembersPeoplePicker();
+                    return;
+                  }
+                  this._handleOnAddCommitteeNoteRecords();
+                  this.setState({ committeeNoteRecordSelectedValue: "" });
+                }}
+              >
+                Add
+              </DefaultButton>
             </div>
+           
+          </div>}
+          
             <div style={{ overflowX: "auto" }}>
               <DetailsList
                 items={this.state.committeeNoteRecordsData} // Data for the table
@@ -2772,6 +2891,37 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             </div>
           </div>
         </div>
+
+
+          {/* Comments section */}
+          {this.state.statusNumber!== '' &&
+             <div
+             className={`${styles.generalSectionMainContainer}`}
+             style={{ flexGrow: 1, margin: "10 10px" }}
+           >
+             <h1 className={styles.viewFormHeaderSectionContainer}>Comments</h1>
+           </div>
+          }
+       
+
+        {this.state.statusNumber!== '' && 
+         <div
+         className={`${styles.generalSectionApproverDetails}`}
+         style={{ flexGrow: 1, margin: "10 10px" }}
+       >
+         <div>
+           <div style={{ overflowX: "auto" }}>
+             <DetailsList
+               items={this.state.CommitteeMeetingMemberCommentsDT} // Data for the table
+               columns={this.columnsCommitteeComments} // Columns for the table
+               layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
+               selectionMode={SelectionMode.none} // No selection column
+               isHeaderVisible={true} // Show column headers
+             />
+           </div>
+         </div>
+       </div>}
+       
         {/* WorkFlow  section */}
 
         {this._itemId ? (
@@ -3059,6 +3209,33 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             </div>
           </>
         </Modal>
+        {/* Loading Section */}
+
+        {this.state.isLoading && (
+              <div>
+                <Modal
+                  isOpen={this.state.isLoading}
+                  containerClassName={styles.spinnerModalTranparency}
+                  styles={{
+                    main: {
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "transparent", // Removes background color
+                      boxShadow: "none", // Removes box shadow
+                    },
+                  }}
+                >
+                  <div className="spinner">
+                    <Spinner
+                      label="still loading..."
+                      ariaLive="assertive"
+                      size={SpinnerSize.large}
+                    />
+                  </div>
+                </Modal>
+              </div>
+            )}
       </div>
     );
   }

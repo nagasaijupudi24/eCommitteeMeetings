@@ -221,7 +221,7 @@ export default class XenWpCommitteeMeetingsFormsWebPart extends BaseClientSideWe
                   value: this.properties.homePageUrl
                 }),
 
-                PropertyPaneTextField('passCodeCreateUrl', {
+                PropertyPaneTextField('passCodeUrl', {
                   label: "Create Passcode URL",
                   // Use a default value for the home URL if the description is not provided.
                   value: this.properties.passCodeUrl,

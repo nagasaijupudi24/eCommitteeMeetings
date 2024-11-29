@@ -13,8 +13,7 @@ import {
   TextField,
   PrimaryButton,
   DefaultButton,
-  MessageBar,
-  MessageBarType,
+ 
   Modal,
   IconButton,
 } from "@fluentui/react";
@@ -306,25 +305,11 @@ export default class PasscodeModal extends React.Component<
         <div className={styles.body} style={{ textAlign: "center" }}>
           {isCreating ? (
             <>
-              <MessageBar messageBarType={MessageBarType.info}>
+              <p>
                 Passcode is not set. Please create a passcode to proceed
                 further.
-              </MessageBar>
-              <div className={styles.footer}>
-                <PrimaryButton
-                  className={styles.button}
-                  text="Create Passcode"
-                  onClick={this.redirectToCreatePasscode}
-                  iconProps={{ iconName: "OpenInNewTab" }}
-                />
-                <DefaultButton
-                  className={styles.button}
-                  text="Cancel"
-                  onClick={onClose}
-                  iconProps={{ iconName: "ErrorBadgeIcon" }}
-                  styles={{ textContainer: styles.buttonText }}
-                />
-              </div>
+              </p>
+             
             </>
           ) : (
             <>
@@ -345,13 +330,20 @@ export default class PasscodeModal extends React.Component<
           )}
         </div>
         <div className={styles.footer}>
+          {isCreating?
           <PrimaryButton
+          className={styles.button}
+          text="Create Passcode"
+          styles={{ root: styles.buttonContent }}
+          onClick={this.redirectToCreatePasscode}
+          iconProps={{ iconName: "CheckedOutByOther12" }}
+        />:<PrimaryButton
             className={styles.button}
             text="Verify"
             styles={{ root: styles.buttonContent }}
             iconProps={{ iconName: "CheckedOutByOther12" }}
             onClick={this.validatePasscode}
-          />
+          />}
           <DefaultButton
             className={styles.button}
             text="Cancel"

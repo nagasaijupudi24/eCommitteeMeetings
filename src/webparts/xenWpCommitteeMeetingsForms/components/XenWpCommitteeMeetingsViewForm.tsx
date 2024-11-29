@@ -20,6 +20,7 @@ import {
   // DialogType,
   // Dropdown,
   IColumn,
+  Icon,
   // Icon,
   IconButton,
   Link,
@@ -27,6 +28,8 @@ import {
   Modal,
   PrimaryButton,
   SelectionMode,
+  Spinner,
+  SpinnerSize,
   TextField,
   Toggle,
 } from "@fluentui/react";
@@ -78,6 +81,7 @@ interface CommtteeMeetingsState {
    isPasscodeValidated: boolean;
  
    passCodeValidationFrom: any;
+   isLoading:any;
 }
 const getIdFromUrl = (): any => {
   const params = new URLSearchParams(window.location.search);
@@ -149,12 +153,22 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
         isPasscodeModalOpen: false,
         isPasscodeValidated: false, // New state to check if passcode is validated
         passCodeValidationFrom: "",
+        isLoading:true
     };
     const listName = this.props.listName;
     this._listName = listName?.title;
     // console.log(this._listName, this.props.listName, "onload");
     this._getItemBy();
     this._fetchDepartmentAlias();
+  }
+
+  public componentDidMount() {
+    // Add resize listener
+   
+    
+    setTimeout(() => {
+      this.setState({isLoading:false})
+    }, 3000);
   }
 
   private _fetchDepartmentAlias = async (): Promise<void> => {
@@ -174,39 +188,49 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
 
       // console.log("Fetched items from Departments:", items);
 
-      // Step 2: Find the department entry where the Title or Department contains "Development"
-      const specificDepartment = items.find(
-        (each: any) =>
-          each.Department.includes("Development") ||
-          each.Title?.includes("Development")
-      );
+      // let deparement = '';
 
-      if (specificDepartment) {
-        const departmentAlias = specificDepartment.DepartmentAlias;
-        // console.log(
-        //   "Department alias for department with 'Development' in title:",
-        //   departmentAlias
-        // );
+      const profile = await this.props.sp.profiles.myProperties();
 
-        // Step 3: Update state with the department alias
-        this.setState(
-          {
-            departmentAlias: departmentAlias, // Store the department alias
-          },
-          () => {
+      // this._userName = profile.DisplayName;
+      // this._role = profile.Title;
+
+      profile.UserProfileProperties.filter((element: any) => {
+        if (element.Key === "Department") {
+          // department: element.Value
+
+          const specificDepartment = items.find(
+            (each: any) =>
+              each.Department.includes("Development") ||
+            each.Title?.includes("Development")
+          );
+    
+          if (specificDepartment) {
+            const departmentAlias = specificDepartment.DepartmentAlias;
             // console.log(
-            //   "Updated state with department alias:",
-            //   this.state.departmentAlias
+            //   "Department alias for department with 'Development' in title:",
+            //   departmentAlias
             // );
+    
+            // Step 3: Update state with the department alias
+            this.setState(
+              {
+                departmentAlias: departmentAlias, // Store the department alias
+              },
+              
+            );
           }
-        );
-      } else {
-        // console.log("No department found with 'Development' in title.");
-      }
+        }
+      });
+
+
+      // Step 2: Find the department entry where the Title or Department contains "Development"
+      
     } catch (error) {
       // console.error("Error fetching department alias: ", error);
     }
   };
+
 
   private stylesModal = mergeStyleSets({
     modal: {
@@ -318,13 +342,13 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
      CurrentApprover,PreviousApprover,FinalApprover,Chairman`)();
     // console.log(item, "item");
 
-    const currentyear = new Date().getFullYear();
-    const nextYear = (currentyear + 1).toString().slice(-2);
+    // const currentyear = new Date().getFullYear();
+    // const nextYear = (currentyear + 1).toString().slice(-2);
 
     if (item) {
       // console.log(JSON.parse(item.AuditTrail));
       this.setState({
-        meetingId: `${this.state.departmentAlias}/${currentyear}-${nextYear}/${itemId}`,
+        meetingId: item.Title,
         MeetingNumber: item.MeetingNumber,
         MeetingDate: item.MeetingDate
           ? new Date(item.MeetingDate).toLocaleDateString()
@@ -389,7 +413,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "Member Name",
       fieldName: "memberEmailName",
       minWidth: 60,
-      maxWidth: 120,
+      maxWidth: 250,
       isResizable: true,
     },
     {
@@ -397,16 +421,67 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth: 150,
-      maxWidth: 300,
+      maxWidth: 180,
       isResizable: true,
     },
     {
       key: "designation",
       name: "Designation",
       fieldName: "designation",
-      minWidth: 150,
-      maxWidth: 300,
+      minWidth: 100,
+      maxWidth: 180,
       isResizable: true,
+    },
+    // {
+    //   key: "status",
+    //   name: "Status",
+    //   fieldName: "status",
+    //   minWidth: 100,
+    //   maxWidth: 180,
+    //   isResizable: true,
+    // },
+
+    {
+      key: 'status',
+      name: 'Status',
+      fieldName: 'status',
+      minWidth: 100,
+      maxWidth: 180,
+      isResizable: true,
+      onRender: (item: any) => {
+        // console.log(item);
+    
+        let iconName = '';
+        // console.log(item);
+        // console.log(item.status);
+        switch (item.status) {
+         
+          case "Pending": 
+            iconName = 'AwayStatus';
+            break;
+          case 'Waiting':
+            iconName = 'Refresh';
+            break;
+          case 'Approved':
+            iconName = 'CompletedSolid';
+            break;
+         
+          case 'Returned':
+            iconName = 'ReturnToSession';
+            break;
+      
+          default:
+            iconName = 'AwayStatus';
+            break;
+        }
+    
+        return (
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <Icon iconName={iconName} />
+            <span style={{ marginLeft: '8px', lineHeight: '24px' }}>{item.status}</span>
+          </div>
+        );
+      },
     },
     {
       key: "actionDate",
@@ -465,7 +540,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "Guest Members Name",
       fieldName: "memberEmailName",
       minWidth: 150,
-      maxWidth: 300,
+      maxWidth: 400,
       isResizable: true,
     },
     {
@@ -473,7 +548,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth: 150,
-      maxWidth: 300,
+      maxWidth: 400,
       isResizable: true,
     },
     {
@@ -481,7 +556,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "Designation",
       fieldName: "designation",
       minWidth: 150,
-      maxWidth: 300,
+      maxWidth: 290,
       isResizable: true,
     },
   ];
@@ -569,7 +644,8 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       isResizable: true,
       onRender(item, index, column) {
         return (
-          <Link onClick={() => (window.location.href = `${item.noteLink}`)}>
+          <Link  target="_blank"  href={item.noteLink} 
+          rel="noopener noreferrer" >
             {item?.noteLink}
           </Link>
         );
@@ -736,6 +812,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
   };
 
   private handleApproveByMembers = async () => {
+    this.setState({isLoading:true, hideCnfirmationDialog: !this.state.hideCnfirmationDialog,})
 
     let PreviousApprover = null ;
     let currentApproverIndex: any = null;
@@ -808,13 +885,14 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       });
     if (item) {
       this.setState({
+        isLoading: false,
         hideSuccussDialog: !this.state.hideSuccussDialog,
-        hideCnfirmationDialog: !this.state.hideCnfirmationDialog,
         SuccussMsg: "Committee meeting has been approved successfully",
       });
     }
   };
   private handleReturnByMembers = async () => {
+    this.setState({isLoading:true, hideCnfirmationDialog: !this.state.hideCnfirmationDialog,})
     const updatedCurrentApprover = this.state.CommitteeMeetingMembersDTO?.map(
       (obj: { memberEmail: any }) => {
         if (
@@ -862,13 +940,14 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     if (item) {
       this.setState({
         hideSuccussDialog: !this.state.hideSuccussDialog,
-        hideCnfirmationDialog: !this.state.hideCnfirmationDialog,
+        isLoading: false,
         SuccussMsg: "Committee meeting has been returned successfully",
       });
     }
   };
 
   private handleApproveByChairman = async () => {
+    this.setState({isLoading:true, hideCnfirmationDialog: !this.state.hideCnfirmationDialog,})
     const auditTrail: any[] = this.state.AuditTrail;
     const comments = this.state.CommitteeMeetingMemberCommentsDT;
 
@@ -904,7 +983,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     if (item) {
       this.setState({
         hideSuccussDialog: !this.state.hideSuccussDialog,
-        hideCnfirmationDialog: !this.state.hideCnfirmationDialog,
+        isLoading: false,
         SuccussMsg: "Committee meeting has been approved successfully",
       });
     }
@@ -945,15 +1024,23 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
   // };
 
   public _checkCurrentApproverIsApprovedInCommitteMembersDTO = (): any => {
+    // console.log(this.state.CommitteeMeetingMembersDTO)
     const currentApprover = this.state.CommitteeMeetingMembersDTO.filter(
       (each: any) => {
-        if (each.memberEmail === this.props.context.pageContext.user.email) {
+        // console.log(each)
+        if (each.memberEmail === this.props.context.pageContext.user.email && each.memberEmail === this.state.CurrentApprover?.EMail) {
           return each;
         }
       }
     );
+
     // console.log(currentApprover)
-    return currentApprover[0]?.statusNumber !== "9000";
+    // console.log(currentApprover[0]?.statusNumber !== "9000" )
+    // console.log(currentApprover[0]?.memberEmail )
+    // console.log(this.props.context.pageContext.user.email)
+    // console.log(currentApprover[0]?.memberEmail === this.props.context.pageContext.user.email)
+    // console.log(currentApprover[0]?.statusNumber !== "9000" &&currentApprover[0]?.memberEmail === this.props.context.pageContext.user.email)
+    return currentApprover[0]?.statusNumber !== "9000" &&currentApprover[0]?.memberEmail === this.props.context.pageContext.user.email ;
   };
 
   private _makeIsPassCodeValidateFalse = (): void => {
@@ -1591,6 +1678,36 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
             </div>
           </>
         </Modal>
+
+          {/* Loading Section */}
+
+          {this.state.isLoading && (
+              <div>
+                <Modal
+                  isOpen={this.state.isLoading}
+                  containerClassName={styles.spinnerModalTranparency}
+                  styles={{
+                    main: {
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "transparent", // Removes background color
+                      boxShadow: "none", // Removes box shadow
+                    },
+                  }}
+                >
+                  <div className="spinner">
+                    <Spinner
+                      label="still loading..."
+                      ariaLive="assertive"
+                      size={SpinnerSize.large}
+                    />
+                  </div>
+                </Modal>
+              </div>
+            )}
+
+            {/* PassCode Section */}
 
         <form>
               <PasscodeModal
