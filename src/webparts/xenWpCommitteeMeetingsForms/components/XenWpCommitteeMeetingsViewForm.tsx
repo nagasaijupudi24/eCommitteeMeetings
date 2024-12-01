@@ -23,7 +23,7 @@ import {
   Icon,
   // Icon,
   IconButton,
-  Link,
+  // Link,
   mergeStyleSets,
   Modal,
   PrimaryButton,
@@ -159,7 +159,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     this._listName = listName?.title;
     // console.log(this._listName, this.props.listName, "onload");
     this._getItemBy();
-    this._fetchDepartmentAlias();
+    // this._fetchDepartmentAlias();
   }
 
   public componentDidMount() {
@@ -171,65 +171,65 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     }, 3000);
   }
 
-  private _fetchDepartmentAlias = async (): Promise<void> => {
-    try {
-      // console.log("Starting to fetch department alias...");
+  // private _fetchDepartmentAlias = async (): Promise<void> => {
+  //   try {
+  //     // console.log("Starting to fetch department alias...");
 
-      // Step 1: Fetch items from the Departments list
-      const items: any[] = await this.props.sp.web.lists
-        .getByTitle("Departments")
-        .items.select(
-          "Department",
-          "DepartmentAlias",
-          "Admin/EMail",
-          "Admin/Title"
-        ) // Fetching relevant fields
-        .expand("Admin")();
+  //     // Step 1: Fetch items from the Departments list
+  //     const items: any[] = await this.props.sp.web.lists
+  //       .getByTitle("Departments")
+  //       .items.select(
+  //         "Department",
+  //         "DepartmentAlias",
+  //         "Admin/EMail",
+  //         "Admin/Title"
+  //       ) // Fetching relevant fields
+  //       .expand("Admin")();
 
-      // console.log("Fetched items from Departments:", items);
+  //     // console.log("Fetched items from Departments:", items);
 
-      // let deparement = '';
+  //     // let deparement = '';
 
-      const profile = await this.props.sp.profiles.myProperties();
+  //     const profile = await this.props.sp.profiles.myProperties();
 
-      // this._userName = profile.DisplayName;
-      // this._role = profile.Title;
+  //     // this._userName = profile.DisplayName;
+  //     // this._role = profile.Title;
 
-      profile.UserProfileProperties.filter((element: any) => {
-        if (element.Key === "Department") {
-          // department: element.Value
+  //     profile.UserProfileProperties.filter((element: any) => {
+  //       if (element.Key === "Department") {
+  //         // department: element.Value
 
-          const specificDepartment = items.find(
-            (each: any) =>
-              each.Department.includes("Development") ||
-            each.Title?.includes("Development")
-          );
+  //         const specificDepartment = items.find(
+  //           (each: any) =>
+  //             each.Department.includes("Development") ||
+  //           each.Title?.includes("Development")
+  //         );
     
-          if (specificDepartment) {
-            const departmentAlias = specificDepartment.DepartmentAlias;
-            // console.log(
-            //   "Department alias for department with 'Development' in title:",
-            //   departmentAlias
-            // );
+  //         if (specificDepartment) {
+  //           const departmentAlias = specificDepartment.DepartmentAlias;
+  //           // console.log(
+  //           //   "Department alias for department with 'Development' in title:",
+  //           //   departmentAlias
+  //           // );
     
-            // Step 3: Update state with the department alias
-            this.setState(
-              {
-                departmentAlias: departmentAlias, // Store the department alias
-              },
+  //           // Step 3: Update state with the department alias
+  //           this.setState(
+  //             {
+  //               departmentAlias: departmentAlias, // Store the department alias
+  //             },
               
-            );
-          }
-        }
-      });
+  //           );
+  //         }
+  //       }
+  //     });
 
 
-      // Step 2: Find the department entry where the Title or Department contains "Development"
+  //     // Step 2: Find the department entry where the Title or Department contains "Development"
       
-    } catch (error) {
-      // console.error("Error fetching department alias: ", error);
-    }
-  };
+  //   } catch (error) {
+  //     // console.error("Error fetching department alias: ", error);
+  //   }
+  // };
 
 
   private stylesModal = mergeStyleSets({
@@ -644,10 +644,20 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       isResizable: true,
       onRender(item, index, column) {
         return (
-          <Link  target="_blank"  href={item.noteLink} 
-          rel="noopener noreferrer" >
-            {item?.noteLink}
-          </Link>
+
+          <a
+          href={item.noteLink} 
+          target="_blank"
+          rel="noopener noreferrer"
+          data-interception="off"
+          className={styles.notePdfCustom}
+        >
+          {item?.noteLink}
+        </a>
+          // <Link  target="_blank"  href={item.noteLink} 
+          // rel="noopener noreferrer" >
+          //   {item?.noteLink}
+          // </Link>
         );
       },
     },
