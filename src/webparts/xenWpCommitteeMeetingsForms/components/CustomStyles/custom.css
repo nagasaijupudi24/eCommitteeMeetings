@@ -26,6 +26,7 @@ div > .ql-container {
 }
 
 div > .ql-toolbar {
+  display: inline-block!important;
  
   /* border: 1px solid red !important; */
     left: 55px;

@@ -626,7 +626,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth:150,
-      maxWidth: 230,
+      maxWidth: 245,
       isResizable: true,
     },
     {
@@ -634,7 +634,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Designation",
       fieldName: "designation",
       minWidth: 150,
-      maxWidth: 230,
+      maxWidth: 245,
       isResizable: true,
     },
     {
@@ -711,7 +711,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Guest Members",
       fieldName: "memberEmailName",
       minWidth: 150,
-      maxWidth: 230,
+      maxWidth: 245,
       isResizable: true,
     },
     {
@@ -719,7 +719,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "SR No",
       fieldName: "srNo",
       minWidth: 150,
-      maxWidth: 230,
+      maxWidth: 245,
       isResizable: true,
     },
     {
@@ -727,7 +727,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       name: "Designation",
       fieldName: "designation",
       minWidth: 150,
-      maxWidth: 230,
+      maxWidth: 245,
       isResizable: true,
     },
     {

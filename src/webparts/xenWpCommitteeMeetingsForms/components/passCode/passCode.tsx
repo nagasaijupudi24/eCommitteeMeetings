@@ -10,12 +10,13 @@ import "@pnp/sp/items";
 import "@pnp/sp/files/web";
 
 import {
-  TextField,
+  // TextField,
   PrimaryButton,
   DefaultButton,
  
   Modal,
   IconButton,
+  Icon,
 } from "@fluentui/react";
 import { mergeStyleSets } from "@fluentui/react/lib/Styling";
 import CryptoJS from "crypto-js";
@@ -119,12 +120,8 @@ export default class PasscodeModal extends React.Component<
     // console.log("User passcode check:", userPasscode);
   };
 
-  private onPasscodeChange = (
-    event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>,
-    newValue?: string
-  ) => {
-    this.setState({ passcode: newValue || "", errorMessage: "" });
-    // console.log("Passcode changed:", newValue);
+  private onPasscodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ passcode: event.target.value });
   };
 
   // private togglePasswordVisibility = () => {
@@ -166,6 +163,15 @@ export default class PasscodeModal extends React.Component<
   private redirectToCreatePasscode = () => {
     // console.log("Redirecting to create passcode URL:", this.props.createPasscodeUrl);
     window.location.href = this.props.createPasscodeUrl;
+  };
+
+  private togglePasscodeVisibility = () => {
+    this.setState((prevState) => ({
+      isPasswordVisible: !prevState.isPasswordVisible,
+    }));
+    setTimeout(() => {
+      this.setState({ isPasswordVisible: false });
+    }, 500);
   };
 
   public render(): React.ReactElement<IPasscodeModalProps> {
@@ -315,13 +321,51 @@ export default class PasscodeModal extends React.Component<
             <>
               <div className={styles.contentContainer}>
                 <label>Enter your passcode for verification:</label>
-                <TextField
+                {/* <TextField
                   value={passcode}
                   canRevealPassword
                   onChange={this.onPasscodeChange}
                   type="password"
                   styles={{ root: { width: "100%", marginTop: "5px" } }} // This line ensures the TextField occupies the full width
-                />
+                /> */}
+                <div style={{ width: "100%", marginTop: "5px", position: "relative" }}>
+  <input
+    type={this.state.isPasswordVisible ? "text" : "password"}
+    value={passcode}
+    onChange={this.onPasscodeChange}
+    maxLength={6}
+    pattern="\d*"
+    title="Please enter a 6-character combination of alphabets and numbers"
+    style={{
+      width: "100%",
+      padding: "8px 40px 8px 8px", // Extra padding for space for the icon
+      boxSizing: "border-box",
+      border: "1px solid #ccc",
+      borderRadius: "4px",
+      fontSize: "14px",
+    }}
+  />
+  <button
+    type="button"
+    onClick={this.togglePasscodeVisibility}
+    style={{
+      position: "absolute",
+      right: "10px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      backgroundColor: "transparent",
+      border: "none",
+      cursor: "pointer",
+      padding: 0,
+    }}
+    aria-label={this.state.isPasswordVisible ? "Hide passcode" : "Show passcode"}
+  >
+    <Icon
+      iconName={this.state.isPasswordVisible ? "View" : "Hide"}
+      style={{ fontSize: "18px", color: "#666" }}
+    />
+  </button>
+</div>
                 {errorMessage && (
                   <span className={styles.errorMessage}>{errorMessage}</span>
                 )}
