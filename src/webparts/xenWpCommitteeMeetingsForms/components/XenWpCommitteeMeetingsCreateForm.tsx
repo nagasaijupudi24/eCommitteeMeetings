@@ -22,6 +22,7 @@ import {
   IColumn,
   Icon,
   IconButton,
+  IDetailsFooterProps,
   IDropdownOption,
   Link,
   mergeStyleSets,
@@ -520,7 +521,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       )
       .expand("Chairman", "CurrentApprover")();
 
-    // console.log(`${id} ------Details`, item);
+    console.log(`${id} ------Details`, item);
 
    
 
@@ -545,7 +546,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       convernorFeildValue: item.Department,
       charimanFeildValue: item.Chairman.Title,
       auditTrail: JSON.parse(item.AuditTrail),
-      isLoading:false
+      isLoading:false,
+      convernorData:JSON.parse(item.ConvenerDTO),
+      
+      charimanData: { ...item.Chairman, chairmanId: item.ChairmanId },
+      
     });
 
     return item;
@@ -990,11 +995,13 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
   private checkSelectedCommitteMemberIsInRequestorOrChairmanOrGuestMemberOrCommitteMember =
     (): boolean => {
       const committeeMemberEmail = this.state.committeeMembersData.map(
-        (each: any) => each.email
+        (each: any) => each.email|| each.memberEmail
       );
+      console.log(committeeMemberEmail)
 
       const committeeGuestMembersEmail =
-        this.state.committeeGuestMembersData.map((each: any) => each.email);
+        this.state.committeeGuestMembersData.map((each: any) => each.email || each.memberEmail);
+        console.log(committeeGuestMembersEmail)
 
       const selectedCommitteeMembers = this.state.selectedCommitteeMembers[0];
       const selectedCommitteeMembersEmail =
@@ -1028,11 +1035,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
   private checkSelectedGuestMemberIsInRequestorOrChairmanOrGuestMemberOrCommitteMember =
     (): boolean => {
       const committeeMemberEmail = this.state.committeeMembersData.map(
-        (each: any) => each.email
+        (each: any) => each.email|| each.memberEmail
       );
 
       const committeeGuestMembersEmail =
-        this.state.committeeGuestMembersData.map((each: any) => each.email);
+        this.state.committeeGuestMembersData.map((each: any) => each.email|| each.memberEmail);
 
       const selectedGuestMembers = this.state.selectedCommitteeGuestMembers[0];
       const selectedGuestMembersEmail =
@@ -1050,10 +1057,13 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       const isCurrentUserGuestMember =
         this._currentUserEmail === selectedGuestMembersEmail;
 
+        const selectedGuestMemberIsACon =
+        selectedGuestMembersEmail === this.state.convernorData.EMail;
+
       return (
         iscommitteeMemberOrcommitteeGuestMembers ||
         isCurrentUserGuestMember ||
-        selectedMemberIsAChairman
+        selectedMemberIsAChairman||selectedGuestMemberIsACon
       );
     };
 
@@ -1196,6 +1206,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             srNo: newItemsDataNA[0].srNo,
             designation: newItemsDataNA[0].optionalText,
             email: newItemsDataNA[0].email,
+            memberEmail: newItemsDataNA[0].email,
             userId: newItemsDataNA[0].id,
           },
         ],
@@ -1221,6 +1232,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             srNo: newItemsData[0].srNo,
             designation: newItemsData[0].optionalText,
             email: newItemsData[0].email,
+            memberEmail: newItemsData[0].email,
             userId: newItemsData[0].id,
           },
         ],
@@ -1269,6 +1281,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             srNo: newItemsDataNA[0].srNo,
             designation: newItemsDataNA[0].optionalText,
             email: newItemsDataNA[0].email,
+            memberEmail: newItemsDataNA[0].email,
             userId: newItemsDataNA[0].id,
           },
         ],
@@ -1294,6 +1307,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
             srNo: newItemsData[0].srNo,
             designation: newItemsData[0].optionalText,
             email: newItemsData[0].email,
+            memberEmail: newItemsData[0].email,
             userId: newItemsData[0].id,
           },
         ],
@@ -1989,6 +2003,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       alignItems: "center",
       borderBottom: "1px solid #ddd",
       minHeight: "50px",
+      marginBottom:'20px'
     },
     headerTitle: {
       margin: "5px",
@@ -2211,15 +2226,17 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        padding: "20px 0",
-        height: "100%",
+        // padding: "20px 0",
+        
         "@media (min-width: 768px)": {
           marginLeft: "20px", // Adjust width for smaller screens
           marginRight: "20px", // Adjust width for medium screens
+          height: "160px",
         },
         "@media (max-width: 767px)": {
           marginLeft: "20px", // Adjust width for smaller screens
           marginRight: "20px",
+          height: "190px",
         },
       },
       footer: {
@@ -2246,7 +2263,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
       removeTopMargin: {
         marginTop: "4px",
-        marginBottom: "14px",
+        marginBottom: "4px",
         fontWeight: "400",
       },
     });
@@ -2568,7 +2585,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
   public render(): React.ReactElement<IXenWpCommitteeMeetingsFormsProps> {
     // console.log(this.props, "Props of Edit and Create Form while fetching");
-    // console.log(this.state);
+    console.log(this.state);
 
     // const {
     //   description,
@@ -2893,6 +2910,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
                   layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
                   selectionMode={SelectionMode.none} // No selection column
                   isHeaderVisible={true} // Show column headers
+                  onRenderDetailsFooter={(props: IDetailsFooterProps) => {
+                    if (this.state.committeeMembersData.length === 0) {
+                      return (
+                        <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                          No records available
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
                 />
               </div>
           
@@ -2971,6 +2998,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
                 layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
                 selectionMode={SelectionMode.none} // No selection column
                 isHeaderVisible={true} // Show column headers
+                onRenderDetailsFooter={(props: IDetailsFooterProps) => {
+                  if (this.state.committeeGuestMembersData.length === 0) {
+                    return (
+                      <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                        No records available
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
             </div>
           </div>
@@ -3038,6 +3075,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
                 layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
                 selectionMode={SelectionMode.none} // No selection column
                 isHeaderVisible={true} // Show column headers
+                onRenderDetailsFooter={(props: IDetailsFooterProps) => {
+                  if (this.state.committeeNoteRecordsData.length === 0) {
+                    return (
+                      <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                        No records available
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
             </div>
           </div>

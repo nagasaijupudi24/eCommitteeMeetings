@@ -23,6 +23,7 @@ import {
   Icon,
   // Icon,
   IconButton,
+  IDetailsFooterProps,
   // Link,
   mergeStyleSets,
   Modal,
@@ -1110,9 +1111,9 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     return currentApprover[0]?.statusNumber !== "9000" &&currentApprover[0]?.memberEmail === this.props.context.pageContext.user.email ;
   };
 
-  private _makeIsPassCodeValidateFalse = (): void => {
-    this.setState({ isPasscodeValidated: false });
-  };
+  // private _makeIsPassCodeValidateFalse = (): void => {
+  //   this.setState({ isPasscodeValidated: false });
+  // };
 
 
 
@@ -1359,6 +1360,16 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
                 layoutMode={DetailsListLayoutMode.fixedColumns} // Keep columns fixed
                 selectionMode={SelectionMode.none} // No selection column
                 isHeaderVisible={true} // Show column headers
+                onRenderDetailsFooter={(props: IDetailsFooterProps) => {
+                  if (this.state.CommitteeMeetingGuestMembersDTO.length === 0) {
+                    return (
+                      <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
+                        No records available
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
             </div>
           </div>
@@ -1794,7 +1805,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
             // onSuccess={this.handlePasscodeSuccess} // Pass this function as the success handler
             sp={this.props.sp}
             user={this.props.context.pageContext.user}
-            _makeIsPassCodeValidateFalse={this._makeIsPassCodeValidateFalse} onSuccess={this.handlePasscodeSuccess}              />
+            onSuccess={this.handlePasscodeSuccess}              />
             </form>
       </div>
     );
