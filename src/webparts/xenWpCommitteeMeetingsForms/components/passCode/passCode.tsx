@@ -171,13 +171,13 @@ export default class PasscodeModal extends React.Component<
     }));
     setTimeout(() => {
       this.setState({ isPasswordVisible: false });
-    }, 500);
+    }, 250);
   };
 
   public render(): React.ReactElement<IPasscodeModalProps> {
     const { isOpen, onClose } = this.props;
     const {
-      passcode,
+      // passcode,
       errorMessage,
       isCreating,
       // isPasswordVisible,
@@ -331,7 +331,7 @@ export default class PasscodeModal extends React.Component<
                 <div style={{ width: "100%", marginTop: "5px", position: "relative" }}>
   <input
     type={this.state.isPasswordVisible ? "text" : "password"}
-    value={passcode}
+    value={this.state.passcode}
     onChange={this.onPasscodeChange}
     maxLength={6}
     pattern="\d*"
@@ -360,12 +360,14 @@ export default class PasscodeModal extends React.Component<
     }}
     aria-label={this.state.isPasswordVisible ? "Hide passcode" : "Show passcode"}
   >
-    <Icon
-      iconName={this.state.isPasswordVisible ? "View" : "Hide"}
-      style={{ fontSize: "18px", color: "#666" }}
-    />
+    {this.state.isPasswordVisible ? (
+      <Icon iconName="Hide" style={{ fontSize: "18px", color: "#666" }} />
+    ) : (
+      <Icon iconName="View" style={{ fontSize: "18px", color: "#666" }} />
+    )}
   </button>
 </div>
+
                 {errorMessage && (
                   <span className={styles.errorMessage}>{errorMessage}</span>
                 )}

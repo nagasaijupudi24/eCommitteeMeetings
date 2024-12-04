@@ -72,6 +72,7 @@ interface CommtteeMeetingsState {
   CommitteeMeetingMemberCommentsDT: any;
   comments: string;
   isRturn: boolean;
+  isApproverBtn:any;
   Created: any;
   departmentAlias: any;
   meetingId: any;
@@ -147,6 +148,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       CommitteeMeetingMemberCommentsDT: [],
       comments: "",
       isRturn: false,
+      isApproverBtn:true,
       Created: null,
 
         // pass code
@@ -527,10 +529,10 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     // console.log('toggle is ' + (checked ? 'checked' : 'not checked'));
     if (checked) {
       this.setState({
-        isRturn: true,
+        isRturn: true,isApproverBtn:false
       });
     } else {
-      this.setState({ isRturn: false });
+      this.setState({ isRturn: false,isApproverBtn:true });
     }
   };
 
@@ -640,7 +642,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
       name: "Note Link",
       fieldName: "noteLink",
       minWidth: 150,
-      maxWidth: 250,
+      maxWidth: 400,
       isResizable: true,
       onRender(item, index, column) {
         return (
@@ -652,7 +654,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
           data-interception="off"
           className={styles.notePdfCustom}
         >
-          {item?.noteLink}
+          {item?.link}
         </a>
           // <Link  target="_blank"  href={item.noteLink} 
           // rel="noopener noreferrer" >
@@ -851,7 +853,16 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
             ...obj,
             status: "Approved",
             statusNumber: "9000",
-            actionDate: new Date().toLocaleDateString(),
+            actionDate: `${new Date().toLocaleDateString('en-GB', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric' 
+            })} ${new Date().toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit', 
+              hour12: false 
+            })}`
           };
         } else {
           return obj;
@@ -867,7 +878,16 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     auditTrail.push({
       action: `Committee meeting approved by ${this.props.userDisplayName}`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate:`${new Date().toLocaleDateString('en-GB', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric' 
+            })} ${new Date().toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit', 
+              hour12: false 
+            })}`,
     });
     comments.push({
       comments: this.state.comments,
@@ -912,6 +932,16 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
           return {
             ...obj,
             status: "Returned",
+            actionDate: `${new Date().toLocaleDateString('en-GB', { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric' 
+            })} ${new Date().toLocaleTimeString('en-GB', { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit', 
+              hour12: false 
+            })}`
           };
         } else {
           return obj;
@@ -925,12 +955,30 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     auditTrail.push({
       action: `Committee meeting returned by ${this.props.userDisplayName}`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`
     });
     comments.push({
       comments: this.state.comments,
       commentedBy: this.props.userDisplayName,
-      createdDate: new Date().toLocaleDateString(),
+      createdDate:`${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     });
     // console.log(comments);
     const item = await this.props.sp.web.lists
@@ -964,7 +1012,16 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
     auditTrail.push({
       action: `Committee meeting approved by Chairman`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`
     });
     comments.push({
       comments: this.state.comments,
@@ -1470,7 +1527,7 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
                     (obj: { memberEmail: string }) =>
                       obj.memberEmail.toLowerCase() ===
                       this.props.context.pageContext.user.email.toLowerCase()
-                  ) && this.state.StatusNumber === "5000"
+                  ) && this.state.StatusNumber === "5000" && !this.state.isRturn
                 )
               }
             >
@@ -1506,23 +1563,30 @@ export default class XenWpCommitteeMeetingsViewForm extends React.Component<
             </PrimaryButton>
           </span>
 
+          
           <span
-            hidden={
-              !(
-                this.state.Chairman?.EMail.toLowerCase() ===
-                  this.props.context.pageContext.user.email.toLowerCase() &&
-                this.state.StatusNumber === "6000"
-              )
-            }
+          hidden={
+            !(
+              this.state.Chairman?.EMail.toLowerCase() ===
+                this.props.context.pageContext.user.email.toLowerCase() &&
+              this.state.StatusNumber === "6000" && !this.state.isRturn 
+              
+            )
+          }
+        >
+          <PrimaryButton
+            onClick={this.onClickChairman}
+            className={`${styles.responsiveButton} `}
+            iconProps={{ iconName: "DocumentApproval" }}
           >
-            <PrimaryButton
-              onClick={this.onClickChairman}
-              className={`${styles.responsiveButton} `}
-              iconProps={{ iconName: "DocumentApproval" }}
-            >
-              Approve
-            </PrimaryButton>
-          </span>
+            Approve
+          </PrimaryButton>
+        </span>
+          
+          
+          
+
+          
 
           <DefaultButton
             // type="button"

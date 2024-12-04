@@ -369,6 +369,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     // console.log(folderName);
 
     const url = `${this._absUrl}/${this._libraryName}/${folderName}`;
+    // console.log(`${this._libraryName}/${folderName}`)
 
     // console.log(url, "URL.........");
 
@@ -393,7 +394,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
 
       // console.log(pdfLink);
       // console.log(url)
-      return [pdfLink, url];
+      return [pdfLink, `${this._libraryName}/${folderName}`];
     } catch {
       // console.log("failed to fetch");
     }
@@ -404,15 +405,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       // console.log("Starting to fetch department alias...");
 
       // Step 1: Fetch items from the Departments list
-      const items: any[] = await this.props.sp.web.lists
-        .getByTitle("Departments")
-        .items.select(
-          "Department",
-          "DepartmentAlias",
-          "Admin/EMail",
-          "Admin/Title"
-        ) // Fetching relevant fields
-        .expand("Admin")();
+      // const items: any[] = await this.props.sp.web.lists
+      //   .getByTitle("Departments")
+      //   .items.select(
+      //     "*",
+      //     "Department",
+      //     "DepartmentAlias",
+      //     "Admin/EMail",
+      //     "Admin/Title"
+      //   ) // Fetching relevant fields
+      //   .expand("Admin")();
 
       // console.log("Fetched items from Departments:", items);
 
@@ -423,31 +425,51 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       // this._userName = profile.DisplayName;
       // this._role = profile.Title;
 
-      profile.UserProfileProperties.filter((element: any) => {
+      profile.UserProfileProperties.filter(async (element: any) => {
         if (element.Key === "Department") {
+
+          const items: any[] = await this.props.sp.web.lists
+          .getByTitle("Departments")
+          .items .filter(`Department eq '${element.Value}'`).select(
+            "*",
+            "Department",
+            "DepartmentAlias",
+            "Admin/EMail",
+            "Admin/Title"
+          ) // Fetching relevant fields
+         .expand("Admin")();
+  
+        console.log("based on Deparment Filter Fetched items from Departments:", items);
+
+        this.setState(
+          {
+            departmentAlias: items[0].DepartmentAlias, // Store the department alias
+          },
+          
+        );
           // department: element.Value
 
-          const specificDepartment = items.find(
-            (each: any) =>
-              each.Department.includes(element.Value) ||
-              each.Title?.includes(element.Value)
-          );
+          // const specificDepartment = items.find(
+          //   (each: any) =>
+          //     each.Department.includes(element.Value) ||
+          //     each.Title?.includes(element.Value)
+          // );
     
-          if (specificDepartment) {
-            const departmentAlias = specificDepartment.DepartmentAlias;
-            // console.log(
-            //   "Department alias for department with 'Development' in title:",
-            //   departmentAlias
-            // );
+          // if (specificDepartment) {
+          //   const departmentAlias = specificDepartment.DepartmentAlias;
+          //   // console.log(
+          //   //   "Department alias for department with 'Development' in title:",
+          //   //   departmentAlias
+          //   // );
     
-            // Step 3: Update state with the department alias
-            this.setState(
-              {
-                departmentAlias: departmentAlias, // Store the department alias
-              },
+          //   // Step 3: Update state with the department alias
+          //   this.setState(
+          //     {
+          //       departmentAlias: departmentAlias, // Store the department alias
+          //     },
               
-            );
-          }
+          //   );
+          // }
         }
       });
 
@@ -646,10 +668,12 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       isResizable: true,
       onRender: (_item: any, index?: number) => (
         <IconButton
+        // disabled = {this.state.statusNumber === '1000' || this.state.statusNumber === '2000'}
           iconProps={{ iconName: "Delete" }}
           title="Delete"
           ariaLabel="Delete"
           onClick={() => this.handleDeleteCommitteeMemberData(index!)}
+          styles={{ root: { paddingBottom: '16px',background:'transparent' } }}
         />
       ),
     },
@@ -739,10 +763,12 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       isResizable: true,
       onRender: (_item: any, index?: number) => (
         <IconButton
+        //  disabled = {this.state.statusNumber === '1000' || this.state.statusNumber === '2000'}
           iconProps={{ iconName: "Delete" }}
           title="Delete"
           ariaLabel="Delete"
           onClick={() => this.handleDeleteGuestMember(index!)}
+          styles={{ root: { paddingBottom: '16px',background:'transparent' } }}
         />
       ),
     },
@@ -844,6 +870,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           <IconButton
             iconProps={{ iconName: "Edit" }}
             title="Edit"
+           
             ariaLabel="Edit"
             onClick={() => {
               // console.log("Edit is Triggered");
@@ -858,10 +885,13 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           />
         ) : (
           <IconButton
+          // disabled = {this.state.statusNumber === '1000' || this.state.statusNumber === '2000'}
+          
             iconProps={{ iconName: "Delete" }}
             title="Delete"
             ariaLabel="Delete"
             onClick={() => this._deleteRecord(item.id)}
+            styles={{ root: { paddingBottom: '16px',background:'transparent' } }}
           />
         ),
     },
@@ -1465,7 +1495,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       action: `Committee Meeting ${status}`,
 
       
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     };
     auditTrail.push(auditLog);
 
@@ -1551,7 +1590,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     const auditTrail = {
       action: `Committee Meeting Published`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     }
 
     
@@ -1563,6 +1611,28 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
           .update({
             StatusNumber: "2000",
             MeetingStatus: "Published",
+            FinalApproverId:
+        this.state.committeeMembersData[
+          this.state.committeeMembersData.length - 1
+        ].userId,
+      CommitteeMeetingMembersDTO: this._getCommitteeMeetingMembersDTO(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingGuestMembersDTO: this._getCommitteeMeetingMembersDTO(
+        this.state.committeeGuestMembersData
+      ),
+      CommitteeMeetingNoteDTO: JSON.stringify(
+        this.state.committeeNoteRecordsData
+      ),
+      CurrentApproverId: this._getCurrrentApproverId(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingMembersId: this._getMemeberId(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingGuestsId: this._getMemeberId(
+        this.state.committeeGuestMembersData
+      ),
 
             AuditTrail: JSON.stringify([...this.state.auditTrail,auditTrail]),
             startProcessing: true,
@@ -1606,7 +1676,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     auditTrail.push({
       action: `Meeting Returned Back`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     });
 
       
@@ -1627,6 +1706,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
               StatusNumber: "5000",
               AuditTrail: JSON.stringify(auditTrail),
               startProcessing: true,
+              PreviousActionerId: (await this.props.sp?.web.currentUser())?.Id,
 
             }
           )
@@ -1657,7 +1737,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     auditTrail.push({
       action: `Meeting Over`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     });
 
      await this.props.sp.web.lists
@@ -1668,6 +1757,28 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         AuditTrail: JSON.stringify(auditTrail),
         startProcessing: true,
         MeetingStatus: "Meeting Over",
+        FinalApproverId:
+        this.state.committeeMembersData[
+          this.state.committeeMembersData.length - 1
+        ].userId,
+      CommitteeMeetingMembersDTO: this._getCommitteeMeetingMembersDTO(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingGuestMembersDTO: this._getCommitteeMeetingMembersDTO(
+        this.state.committeeGuestMembersData
+      ),
+      CommitteeMeetingNoteDTO: JSON.stringify(
+        this.state.committeeNoteRecordsData
+      ),
+      CurrentApproverId: this._getCurrrentApproverId(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingMembersId: this._getMemeberId(
+        this.state.committeeMembersData
+      ),
+      CommitteeMeetingGuestsId: this._getMemeberId(
+        this.state.committeeGuestMembersData
+      ),
         PreviousActionerId: (await this.props.sp?.web.currentUser())?.Id
       });
     // const id = response.Id;
@@ -1683,7 +1794,16 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
     auditTrail.push({
       action: `Meeting MOM Published`,
       actionBy: this.props.userDisplayName,
-      actionDate: new Date().toLocaleDateString(),
+      actionDate: `${new Date().toLocaleDateString('en-GB', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric' 
+      })} ${new Date().toLocaleTimeString('en-GB', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      })}`,
     });
 
      await this.props.sp.web.lists
@@ -1789,7 +1909,38 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
   private _handleOnAddCommitteeNoteRecords = (): any => {
     this.state.committeeNoteRecordDropDownData.filter(
       (each: any) => each.key === this.state.committeeNoteRecordSelectedValue
+
+
+
+      
     );
+
+    // console.log(this.state.committeeNoteRecordSelectedValue)
+    // console.log(this.state.committeeNoteRecordsData)
+    
+    const fiterSelected = this.state.committeeNoteRecordsData.filter(
+      (each:any)=>{
+
+        if  (each.key === this.state.committeeNoteRecordSelectedValue){
+         
+    
+          return each;
+        
+
+        }
+      }
+      
+    )
+    
+
+    if  (fiterSelected[0]?.key === this.state.committeeNoteRecordSelectedValue){
+      this.setState({
+        isModalOpen: true,
+        modalMessage: "Please select Another Note Record, which is already Selected",
+      });
+
+      return;
+    }
 
     this.setState({
       committeeNoteRecordsData: [
@@ -1807,7 +1958,7 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
       (each: any) => {
         // console.log(each, "Each Note Record");
         // console.log(each.mom === "", "each MOM is empty...");
-        return each.mom === "";
+        return each.mom === "" || each.mom==="<p><br></p>";
       }
     );
   
@@ -2339,11 +2490,11 @@ export default class XenWpCommitteeMeetingsCreateForm extends React.Component<
         "Please select Committee Members",
         "isWarningCommitteeMembers",
       ],
-      committeeGuestMembers: [
-        this.state.committeeGuestMembersData,
-        "Please select Guest Members",
-        "isWarningCommitteeGuestMembers",
-      ],
+      // committeeGuestMembers: [
+      //   this.state.committeeGuestMembersData,
+      //   "Please select Guest Members",
+      //   "isWarningCommitteeGuestMembers",
+      // ],
       committeeNoteRecords: [
         this.state.committeeNoteRecordsData,
         "Please select Committee Note Records",
